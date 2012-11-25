@@ -61,5 +61,10 @@ namespace Tempest.Social
 	public static class SocialProtocol
 	{
 		public static readonly Protocol Instance = new Protocol (2, 1);
+
+		static SocialProtocol()
+		{
+			Instance.DiscoverFromAssemblyOf<SocialMessage>();
+		}
 	}
 }
