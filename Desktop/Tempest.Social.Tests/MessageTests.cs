@@ -24,6 +24,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System.Collections.Specialized;
+using System.Linq;
 using System.Net;
 using NUnit.Framework;
 using Tempest.Tests;
@@ -66,6 +68,39 @@ namespace Tempest.Social.Tests
 			Assert.AreEqual (person.Identity, msg.Person.Identity);
 			Assert.AreEqual (person.Nickname, msg.Person.Nickname);
 			Assert.AreEqual (person.Status, msg.Person.Status);
+		}
+
+		[Test]
+		public void RequestBuddyListMessage()
+		{
+			var msg = new RequestBuddyListMessage();
+
+			msg = msg.AssertLengthMatches();
+		}
+
+		[Test]
+		public void BuddyListMessage()
+		{
+			Person p1 = new Person ("i1") { Nickname = "p1", Status = Status.Online };
+			Person p2 = new Person ("i2") { Nickname = "p2", Status = Status.Away };
+
+			var msg = new BuddyListMessage();
+			msg.People = new[] { p1, p2 };
+			msg.ChangeAction = NotifyCollectionChangedAction.Add;
+
+			msg = msg.AssertLengthMatches();
+			Person[] people = msg.People.ToArray();
+			Assert.AreEqual (2, people.Length);
+			Assert.IsNotNull (people[0]);
+			Assert.IsNotNull (people[1]);
+
+			Assert.AreEqual (p1.Identity, people[0].Identity);
+			Assert.AreEqual (p1.Nickname, people[0].Nickname);
+			Assert.AreEqual (p1.Status, people[0].Status);
+
+			Assert.AreEqual (p2.Identity, people[1].Identity);
+			Assert.AreEqual (p2.Nickname, people[1].Nickname);
+			Assert.AreEqual (p2.Status, people[1].Status);
 		}
 	}
 }
