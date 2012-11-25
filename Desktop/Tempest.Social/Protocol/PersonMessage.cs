@@ -34,6 +34,11 @@ namespace Tempest.Social
 		{
 		}
 
+		public override bool Authenticated
+		{
+			get { return true; }
+		}
+
 		public Person Person
 		{
 			get;
