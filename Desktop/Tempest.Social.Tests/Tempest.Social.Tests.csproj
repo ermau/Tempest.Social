@@ -43,9 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\Tempest\Desktop\Tempest\Tests\MutableLookupTest.cs">
-      <Link>MutableLookupTest.cs</Link>
-    </Compile>
     <Compile Include="WatchListProviderTests.cs" />
     <Compile Include="BuddyListTests.cs" />
     <Compile Include="IdentityProviderTests.cs" />
