@@ -1,5 +1,5 @@
 ﻿//
-// SocialServer.cs
+// SocialServerTests.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -25,28 +25,18 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
+using NUnit.Framework;
 
-namespace Tempest.Social
+namespace Tempest.Social.Tests
 {
-	public class SocialServer
-		: Server
+	[TestFixture]
+	public class SocialServerTests
 	{
-		public SocialServer (IWatchListProvider provider, IIdentityProvider identityProvider)
-			: base (MessageTypes.Reliable)
+		[Test]
+		public void CtorNull()
 		{
-			if (provider == null)
-				throw new ArgumentNullException ("provider");
-			if (identityProvider == null)
-				throw new ArgumentNullException ("identityProvider");
-
-			this.provider = provider;
-			this.identityProvider = identityProvider;
-			this.RegisterMessageHandler<PersonMessage> (OnPersonMessage);
+			Assert.Throws<ArgumentNullException> (() => new SocialServer (null, new PublicKeyIdentityProvider()));
+			Assert.Throws<ArgumentNullException> (() => new SocialServer (new MemoryWatchListProvider(), null));
 		}
-
-		private readonly IWatchListProvider provider;
-		private readonly IIdentityProvider identityProvider;
-
 	}
 }
