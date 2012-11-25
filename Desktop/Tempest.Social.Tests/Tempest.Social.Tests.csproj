@@ -43,7 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuddyListProviderTests.cs" />
     <Compile Include="BuddyListTests.cs" />
+    <Compile Include="MemoryBuddyListProviderTests.cs" />
     <Compile Include="MessageTests.cs" />
     <Compile Include="PersonTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

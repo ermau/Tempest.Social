@@ -24,11 +24,68 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Cadenza.Collections;
+
 namespace Tempest.Social
 {
 	public class MemoryBuddyListProvider
 		: IBuddyListProvider
 	{
-		
+		public Task AddAsync (string listOwner, string buddy)
+		{
+			if (listOwner == null)
+				throw new ArgumentNullException ("listOwner");
+			if (buddy == null)
+				throw new ArgumentNullException ("buddy");
+
+			lock (this.buddyLists)
+				this.buddyLists.Add (listOwner, buddy);
+
+			return Task.FromResult (true);
+		}
+
+		public Task AddRangeAsync (string listOwner, IEnumerable<string> buddies)
+		{
+			if (listOwner == null)
+				throw new ArgumentNullException ("listOwner");
+			if (buddies == null)
+				throw new ArgumentNullException ("buddies");
+
+			lock (this.buddyLists)
+				this.buddyLists.Add (listOwner, buddies);
+
+			return Task.FromResult (true);
+		}
+
+		public Task RemoveAsync (string listOwner, string buddyId)
+		{
+			if (listOwner == null)
+				throw new ArgumentNullException ("listOwner");
+			if (buddyId == null)
+				throw new ArgumentNullException ("buddyId");
+
+			lock (this.buddyLists)
+				this.buddyLists.Remove (listOwner, buddyId);
+
+			return Task.FromResult (true);
+		}
+
+		public Task<IEnumerable<string>> GetBuddiesAsync (string listOwner)
+		{
+			if (listOwner == null)
+				throw new ArgumentNullException ("listOwner");
+
+			string[] buddies;
+			lock (this.buddyLists)
+				buddies = this.buddyLists[listOwner].ToArray();
+
+			return Task.FromResult<IEnumerable<string>> (buddies);
+		}
+
+		private readonly MutableLookup<string, string> buddyLists = new MutableLookup<string, string>();
 	}
 }

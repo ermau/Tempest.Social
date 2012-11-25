@@ -1,5 +1,5 @@
 ﻿//
-// SocialServer.cs
+// MemoryBuddyListProviderTests.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -24,22 +24,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-
-namespace Tempest.Social
+namespace Tempest.Social.Tests
 {
-	public class SocialServer
-		: Server
+	public class MemoryBuddyListProviderTests
+		: BuddyListProviderTests
 	{
-		public SocialServer (IBuddyListProvider provider)
-			: base (MessageTypes.Reliable)
+		protected override IBuddyListProvider GetProvider()
 		{
-			if (provider == null)
-				throw new ArgumentNullException ("provider");
-
-			this.provider = provider;
+			return new MemoryBuddyListProvider();
 		}
-
-		private readonly IBuddyListProvider provider;
 	}
 }
