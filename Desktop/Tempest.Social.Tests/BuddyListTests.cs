@@ -35,7 +35,7 @@ namespace Tempest.Social.Tests
 		[Test]
 		public void CtorNull()
 		{
-			Assert.Throws<ArgumentNullException> (() => new BuddyList (null));
+			Assert.Throws<ArgumentNullException> (() => new WatchList (null));
 		}
 	}
 }

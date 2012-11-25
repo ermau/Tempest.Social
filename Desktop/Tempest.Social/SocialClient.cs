@@ -36,7 +36,7 @@ namespace Tempest.Social
 		public SocialClient (IClientConnection connection)
 			: base (connection, MessageTypes.Reliable)
 		{
-			this.buddyList = new BuddyList (this);
+			this.watchList = new WatchList (this);
 			this.RegisterMessageHandler<RequestBuddyListMessage> (OnRequestBuddyListMessage);
 		}
 
@@ -50,9 +50,9 @@ namespace Tempest.Social
 		/// </remarks>
 		public event EventHandler BuddyListRequested;
 
-		public BuddyList BuddyList
+		public WatchList WatchList
 		{
-			get { return this.buddyList; }
+			get { return this.watchList; }
 		}
 
 		public Task<EndPoint> RequestEndPointAsync (string identity)
@@ -64,7 +64,7 @@ namespace Tempest.Social
 			                 .ContinueWith (t => t.Result.EndPoint);
 		}
 
-		private readonly BuddyList buddyList;
+		private readonly WatchList watchList;
 
 		private void OnRequestBuddyListMessage (MessageEventArgs<RequestBuddyListMessage> e)
 		{

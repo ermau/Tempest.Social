@@ -31,7 +31,7 @@ namespace Tempest.Social
 	public class SocialServer
 		: Server
 	{
-		public SocialServer (IBuddyListProvider provider)
+		public SocialServer (IWatchListProvider provider)
 			: base (MessageTypes.Reliable)
 		{
 			if (provider == null)

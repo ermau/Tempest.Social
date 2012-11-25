@@ -1,5 +1,5 @@
 ﻿//
-// BuddyList.cs
+// WatchList.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -33,10 +33,10 @@ using System.Linq;
 
 namespace Tempest.Social
 {
-	public sealed class BuddyList
+	public sealed class WatchList
 		: ISerializable, ICollection<Person>, INotifyCollectionChanged
 	{
-		public BuddyList (IClientContext clientContext)
+		public WatchList (IClientContext clientContext)
 		{
 			if (clientContext == null)
 				throw new ArgumentNullException ("clientContext");
