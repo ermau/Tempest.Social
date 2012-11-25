@@ -42,7 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BuddyList.cs" />
+    <Compile Include="WatchList.cs" />
     <Compile Include="IIdentityProvider.cs" />
     <Compile Include="IWatchListProvider.cs">
       <SubType>Code</SubType>
