@@ -44,6 +44,7 @@
     </Compile>
     <Compile Include="BuddyList.cs" />
     <Compile Include="IBuddyListProvider.cs">
+    <Compile Include="IIdentityProvider.cs" />
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MemoryBuddyListProvider.cs">
@@ -57,6 +58,7 @@
     <Compile Include="Protocol\BuddyListMessage.cs" />
     <Compile Include="Protocol\SocialMessage.cs" />
     <Compile Include="Protocol\PersonMessage.cs" />
+    <Compile Include="PublicKeyIdentityProvider.cs" />
     <Compile Include="SocialClient.cs" />
     <Compile Include="SocialServer.cs" />
   </ItemGroup>
