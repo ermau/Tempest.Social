@@ -1,5 +1,5 @@
 ﻿//
-// PersonTests.cs
+// SocialClientTests.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -27,18 +27,27 @@
 
 using System;
 using NUnit.Framework;
+using Tempest.Tests;
 
 namespace Tempest.Social.Tests
 {
 	[TestFixture]
-	public class PersonTests
+	public class SocialClientTests
 	{
+		private SocialClient client;
+		private MockConnectionProvider provider;
+
+		[SetUp]
+		public void Setup()
+		{
+			this.provider = new MockConnectionProvider (SocialProtocol.Instance);
+		}
+
 		[Test]
 		public void CtorInvalid()
 		{
-			Assert.Throws<ArgumentNullException> (() => new Person (null));
-			Assert.Throws<ArgumentException> (() => new Person (String.Empty));
-			Assert.Throws<ArgumentException> (() => new Person ("  "));
+			Assert.Throws<ArgumentNullException> (() => new SocialClient (null, new Person ("identity")));
+			Assert.Throws<ArgumentNullException> (() => new SocialClient (this.provider.GetClientConnection(), null));
 		}
 	}
 }
