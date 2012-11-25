@@ -1,5 +1,5 @@
 ﻿//
-// MemoryBuddyListProvider.cs
+// MemoryWatchListProvider.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -32,8 +32,8 @@ using Cadenza.Collections;
 
 namespace Tempest.Social
 {
-	public class MemoryBuddyListProvider
-		: IBuddyListProvider
+	public class MemoryWatchListProvider
+		: IWatchListProvider
 	{
 		public Task AddAsync (string listOwner, string buddy)
 		{
@@ -74,7 +74,7 @@ namespace Tempest.Social
 			return Task.FromResult (true);
 		}
 
-		public Task<IEnumerable<string>> GetBuddiesAsync (string listOwner)
+		public Task<IEnumerable<string>> GetWatchedAsync (string listOwner)
 		{
 			if (listOwner == null)
 				throw new ArgumentNullException ("listOwner");
@@ -86,6 +86,18 @@ namespace Tempest.Social
 			return Task.FromResult<IEnumerable<string>> (buddies);
 		}
 
-		private readonly MutableLookup<string, string> buddyLists = new MutableLookup<string, string>();
+		public Task<IEnumerable<string>> GetWatchersAsync (string target)
+		{
+			if (target == null)
+				throw new ArgumentNullException ("target");
+
+			string[] owners;
+			lock (this.buddyLists)
+				owners = this.buddyLists.Inverse[target].ToArray();
+
+			return Task.FromResult<IEnumerable<string>> (owners);
+		}
+
+		private readonly BidirectionalLookup<string, string> buddyLists = new BidirectionalLookup<string, string>();
 	}
 }

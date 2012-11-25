@@ -1,5 +1,5 @@
 ﻿//
-// MemoryBuddyListProviderTests.cs
+// MemoryWatchListProviderTests.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -26,12 +26,12 @@
 
 namespace Tempest.Social.Tests
 {
-	public class MemoryBuddyListProviderTests
-		: BuddyListProviderTests
+	public class MemoryWatchListProviderTests
+		: WatchListProviderTests
 	{
-		protected override IBuddyListProvider GetProvider()
+		protected override IWatchListProvider GetProvider()
 		{
-			return new MemoryBuddyListProvider();
+			return new MemoryWatchListProvider();
 		}
 	}
 }

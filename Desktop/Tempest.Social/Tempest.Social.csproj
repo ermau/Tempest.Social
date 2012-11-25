@@ -43,11 +43,11 @@
       <Link>MutableLookup.cs</Link>
     </Compile>
     <Compile Include="BuddyList.cs" />
-    <Compile Include="IBuddyListProvider.cs">
     <Compile Include="IIdentityProvider.cs" />
+    <Compile Include="IWatchListProvider.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MemoryBuddyListProvider.cs">
+    <Compile Include="MemoryWatchListProvider.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Person.cs" />

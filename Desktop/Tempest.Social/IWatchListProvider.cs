@@ -1,5 +1,5 @@
 ﻿//
-// IBuddyListProvider.cs
+// IWatchListProvider.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -30,7 +30,7 @@ using System.Threading.Tasks;
 
 namespace Tempest.Social
 {
-	public interface IBuddyListProvider
+	public interface IWatchListProvider
 	{
 		/// <summary>
 		/// Asynchronously adds an identifier to <paramref name="listOwner"/>'s buddy list.
@@ -57,11 +57,20 @@ namespace Tempest.Social
 		Task RemoveAsync (string listOwner, string buddyId);
 
 		/// <summary>
-		/// Asynchronously retrieves the identifiers on <paramref name="listOwner"/>'s list.
+		/// Asynchronously retrieves the identifiers watched by <paramref name="listOwner"/>'s.
 		/// </summary>
 		/// <param name="listOwner">The <see cref="Person.Identity"/> of the person to retrieve the list for.</param>
 		/// <returns>A future to an enumerable of buddies.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="listOwner"/> is <c>null</c>.</exception>
-		Task<IEnumerable<string>> GetBuddiesAsync (string listOwner);
+		Task<IEnumerable<string>> GetWatchedAsync (string listOwner);
+
+
+		/// <summary>
+		/// Asynchronously retrieves the identifiers watching <paramref name="target"/>.
+		/// </summary>
+		/// <param name="target">The <see cref="Person.Identity"/> of the person being watched.</param>
+		/// <returns>A future to an enumerable of identities who have <paramref name="target"/> on their watch list.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="target"/> is <c>null</c>.</exception>
+		Task<IEnumerable<string>> GetWatchersAsync (string target);
 	}
 }
