@@ -33,22 +33,33 @@ namespace Tempest.Social
 	public class SocialClient
 		: LocalClient
 	{
-		public SocialClient (IClientConnection connection)
+		public SocialClient (IClientConnection connection, Person persona)
 			: base (connection, MessageTypes.Reliable)
 		{
+			if (persona == null)
+				throw new ArgumentNullException ("persona");
+
 			this.watchList = new WatchList (this);
 			this.RegisterMessageHandler<RequestBuddyListMessage> (OnRequestBuddyListMessage);
+			this.persona = persona;
 		}
 
 		/// <summary>
 		/// The server has requested that you send your buddy list in full.
 		/// </summary>
 		/// <remarks>
-		/// For simple match making servers that do not have a storage mechanism,
+		/// <para>For simple match making servers that do not have a storage mechanism,
 		/// it is necessary for the client to persist its own buddy list and resend
-		/// it to the server on each connection.
+		/// it to the server on each connection.</para>
+		/// <para>This event is also an indication that you should record your buddy list
+		/// locally.</para>
 		/// </remarks>
 		public event EventHandler BuddyListRequested;
+
+		public Person Persona
+		{
+			get { return this.persona; }
+		}
 
 		public WatchList WatchList
 		{
@@ -65,6 +76,7 @@ namespace Tempest.Social
 		}
 
 		private readonly WatchList watchList;
+		private readonly Person persona;
 
 		private void OnRequestBuddyListMessage (MessageEventArgs<RequestBuddyListMessage> e)
 		{
