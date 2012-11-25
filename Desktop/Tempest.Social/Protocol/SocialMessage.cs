@@ -61,6 +61,7 @@ namespace Tempest.Social
 	public static class SocialProtocol
 	{
 		public static readonly Protocol Instance = new Protocol (2, 1);
+		public const int DefaultPort = 42920;
 
 		static SocialProtocol()
 		{
