@@ -41,7 +41,7 @@ namespace Tempest.Social
 		Task AddAsync (Person listOwner, Person target);
 		
 		/// <summary>
-		/// Asynchronously adds a set of identifiers to <paramref name="listOwner"/>'s buddy list.
+		/// Asynchronously adds a set of identifiers to <paramref name="listOwner"/>'s watch list.
 		/// </summary>
 		/// <param name="listOwner">The list owner.</param>
 		/// <param name="targets">The people to add.</param>
@@ -49,12 +49,19 @@ namespace Tempest.Social
 		Task AddRangeAsync (Person listOwner, IEnumerable<Person> targets);
 
 		/// <summary>
-		/// Asynchronously removes an identifier to <paramref name="listOwner"/>'s buddy list.
+		/// Asynchronously removes an identifier to <paramref name="listOwner"/>'s watch list.
 		/// </summary>
 		/// <param name="listOwner">The <see cref="Person.Identity"/> of the list owner.</param>
 		/// <param name="target">The <see cref="Person.Identity"/> of the person to remove.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="listOwner"/> or <paramref name="target"/> are <c>null</c>.</exception>
 		Task RemoveAsync (string listOwner, string target);
+
+		/// <summary>
+		/// Asynchronously clears all items on the <paramref name="listOwner"/>'s watch list.
+		/// </summary>
+		/// <param name="listOwner">The <see cref="Person.Identity"/> of the list owner.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="listOwner"/> is <c>null</c>.</exception>
+		Task ClearAsync (string listOwner);
 
 		/// <summary>
 		/// Asynchronously retrieves the identifiers watched by <paramref name="listOwner"/>'s.

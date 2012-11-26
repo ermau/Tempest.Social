@@ -107,6 +107,28 @@ namespace Tempest.Social.Tests
 		}
 
 		[Test]
+		public void ClearAsyncInvalid()
+		{
+			IWatchListProvider provider = GetProvider();
+			Assert.Throws<ArgumentNullException> (() => provider.ClearAsync (null));
+		}
+
+		[Test]
+		public void ClearAsync()
+		{
+			IWatchListProvider provider = GetProvider();
+
+			provider.AddAsync (personA, personB).Wait();
+			provider.AddAsync (personA, personC).Wait();
+			
+			provider.ClearAsync (personA.Identity).Wait();
+			
+			IEnumerable<Person> buddies = provider.GetWatchedAsync (personA.Identity).Result;
+			Assert.IsNotNull (buddies);
+			CollectionAssert.IsEmpty (buddies);
+		}
+
+		[Test]
 		public void GetWatchedAsyncInvalid()
 		{
 			IWatchListProvider provider = GetProvider();

@@ -86,6 +86,17 @@ namespace Tempest.Social
 			return Task.FromResult (true);
 		}
 
+		public Task ClearAsync (string listOwner)
+		{
+			if (listOwner == null)
+				throw new ArgumentNullException ("listOwner");
+
+			lock (this.watchLists)
+				this.watchLists.Remove (listOwner);
+
+			return Task.FromResult (true);
+		}
+
 		public Task<IEnumerable<Person>> GetWatchedAsync (string listOwner)
 		{
 			if (listOwner == null)
