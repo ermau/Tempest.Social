@@ -33,6 +33,10 @@ namespace Tempest.Social.Tests
 {
 	public abstract class WatchListProviderTests
 	{
+		private readonly Person personA = new Person ("A");
+		private readonly Person personB = new Person ("B");
+		private readonly Person personC = new Person ("C");
+
 		protected abstract IWatchListProvider GetProvider();
 
 		[Test]
@@ -40,25 +44,21 @@ namespace Tempest.Social.Tests
 		{
 			IWatchListProvider provider = GetProvider();
 
-			Assert.Throws<ArgumentNullException> (() => provider.AddAsync (null, "buddyId"));
-			Assert.Throws<ArgumentNullException> (() => provider.AddAsync ("ownerId", null));
+			Assert.Throws<ArgumentNullException> (() => provider.AddAsync (null, new Person ("buddyId")));
+			Assert.Throws<ArgumentNullException> (() => provider.AddAsync (new Person ("ownerId"), null));
 		}
 
 		[Test]
 		public void AddAsync()
 		{
 			IWatchListProvider provider = GetProvider();
-
-			const string owner = "identity1";
-			const string buddy1 = "buddy1";
-			const string buddy2 = "buddy2";
 			
-			provider.AddAsync (owner, buddy1).Wait();
-			provider.AddAsync (owner, buddy2).Wait();
+			provider.AddAsync (personA, personB).Wait();
+			provider.AddAsync (personA, personC).Wait();
 
-			IEnumerable<string> buddies = provider.GetWatchedAsync (owner).Result;
-			CollectionAssert.Contains (buddies, buddy1);
-			CollectionAssert.Contains (buddies, buddy2);
+			IEnumerable<Person> buddies = provider.GetWatchedAsync (personA.Identity).Result;
+			CollectionAssert.Contains (buddies, personB);
+			CollectionAssert.Contains (buddies, personC);
 		}
 
 		[Test]
@@ -66,24 +66,20 @@ namespace Tempest.Social.Tests
 		{
 			IWatchListProvider provider = GetProvider();
 
-			Assert.Throws<ArgumentNullException> (() => provider.AddRangeAsync (null, Enumerable.Empty<string>()));
-			Assert.Throws<ArgumentNullException> (() => provider.AddRangeAsync ("ownerId", null));
+			Assert.Throws<ArgumentNullException> (() => provider.AddRangeAsync (null, Enumerable.Empty<Person>()));
+			Assert.Throws<ArgumentNullException> (() => provider.AddRangeAsync (personA, null));
 		}
 
 		[Test]
 		public void AddRangeAsync()
 		{
 			IWatchListProvider provider = GetProvider();
-
-			const string owner = "identity1";
-			const string buddy1 = "buddy1";
-			const string buddy2 = "buddy2";
 			
-			provider.AddRangeAsync (owner, new[] { buddy1, buddy2 }).Wait();
+			provider.AddRangeAsync (personA, new[] { personB, personC }).Wait();
 
-			IEnumerable<string> buddies = provider.GetWatchedAsync (owner).Result;
-			CollectionAssert.Contains (buddies, buddy1);
-			CollectionAssert.Contains (buddies, buddy2);
+			IEnumerable<Person> buddies = provider.GetWatchedAsync (personA.Identity).Result;
+			CollectionAssert.Contains (buddies, personB);
+			CollectionAssert.Contains (buddies, personC);
 		}
 
 		[Test]
@@ -100,18 +96,14 @@ namespace Tempest.Social.Tests
 		{
 			IWatchListProvider provider = GetProvider();
 
-			const string owner = "identity1";
-			const string buddy1 = "buddy1";
-			const string buddy2 = "buddy2";
+			provider.AddAsync (personA, personB).Wait();
+			provider.AddAsync (personA, personC).Wait();
 			
-			provider.AddAsync (owner, buddy1).Wait();
-			provider.AddAsync (owner, buddy2).Wait();
+			provider.RemoveAsync (personA.Identity, personB.Identity).Wait();
 			
-			provider.RemoveAsync (owner, buddy1).Wait();
-			
-			IEnumerable<string> buddies = provider.GetWatchedAsync (owner).Result;
-			CollectionAssert.DoesNotContain (buddies, buddy1);
-			CollectionAssert.Contains (buddies, buddy2);
+			IEnumerable<Person> buddies = provider.GetWatchedAsync (personA.Identity).Result;
+			CollectionAssert.DoesNotContain (buddies, personB);
+			CollectionAssert.Contains (buddies, personC);
 		}
 
 		[Test]
@@ -127,7 +119,7 @@ namespace Tempest.Social.Tests
 		{
 			IWatchListProvider provider = GetProvider();
 
-			IEnumerable<string> buddies = provider.GetWatchedAsync ("identity").Result;
+			IEnumerable<Person> buddies = provider.GetWatchedAsync ("identity").Result;
 			Assert.IsNotNull (buddies);
 			CollectionAssert.IsEmpty (buddies);
 		}
@@ -145,7 +137,7 @@ namespace Tempest.Social.Tests
 		{
 			IWatchListProvider provider = GetProvider();
 
-			IEnumerable<string> buddies = provider.GetWatchersAsync ("identity").Result;
+			IEnumerable<Person> buddies = provider.GetWatchersAsync ("identity").Result;
 			Assert.IsNotNull (buddies);
 			CollectionAssert.IsEmpty (buddies);
 		}
@@ -154,17 +146,13 @@ namespace Tempest.Social.Tests
 		public void GetWatchers()
 		{
 			IWatchListProvider provider = GetProvider();
-
-			const string A = "identity1";
-			const string B = "buddy1";
-			const string C = "buddy2";
 			
-			provider.AddRangeAsync (A, new[] { B, C }).Wait();
-			provider.AddRangeAsync (B, new[] { A, C }).Wait();
+			provider.AddRangeAsync (personA, new[] { personB, personC }).Wait();
+			provider.AddRangeAsync (personB, new[] { personA, personC }).Wait();
 
-			IEnumerable<string> watchers = provider.GetWatchersAsync (C).Result;
-			CollectionAssert.Contains (watchers, A);
-			CollectionAssert.Contains (watchers, B);
+			IEnumerable<Person> watchers = provider.GetWatchersAsync (personC.Identity).Result;
+			CollectionAssert.Contains (watchers, personA);
+			CollectionAssert.Contains (watchers, personB);
 		}
 	}
 }

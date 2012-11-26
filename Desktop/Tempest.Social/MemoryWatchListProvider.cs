@@ -35,69 +35,82 @@ namespace Tempest.Social
 	public class MemoryWatchListProvider
 		: IWatchListProvider
 	{
-		public Task AddAsync (string listOwner, string buddy)
+		public Task AddAsync (Person listOwner, Person target)
 		{
 			if (listOwner == null)
 				throw new ArgumentNullException ("listOwner");
-			if (buddy == null)
-				throw new ArgumentNullException ("buddy");
+			if (target == null)
+				throw new ArgumentNullException ("target");
 
-			lock (this.buddyLists)
-				this.buddyLists.Add (listOwner, buddy);
+			lock (this.watchLists)
+			{
+				this.people[listOwner.Identity] = listOwner;
+				this.people[target.Identity] = target;
+				this.watchLists.Add (listOwner.Identity, target.Identity);
+			}
 
 			return Task.FromResult (true);
 		}
 
-		public Task AddRangeAsync (string listOwner, IEnumerable<string> buddies)
+		public Task AddRangeAsync (Person listOwner, IEnumerable<Person> targets)
 		{
 			if (listOwner == null)
 				throw new ArgumentNullException ("listOwner");
-			if (buddies == null)
-				throw new ArgumentNullException ("buddies");
+			if (targets == null)
+				throw new ArgumentNullException ("targets");
 
-			lock (this.buddyLists)
-				this.buddyLists.Add (listOwner, buddies);
+			lock (this.watchLists)
+			{
+				this.people[listOwner.Identity] = listOwner;
+
+				foreach (Person target in targets)
+				{
+					this.people[target.Identity] = target;
+					this.watchLists.Add (listOwner.Identity, target.Identity);
+				}
+			}
 
 			return Task.FromResult (true);
 		}
 
-		public Task RemoveAsync (string listOwner, string buddyId)
+		public Task RemoveAsync (string listOwner, string target)
 		{
 			if (listOwner == null)
 				throw new ArgumentNullException ("listOwner");
-			if (buddyId == null)
-				throw new ArgumentNullException ("buddyId");
+			if (target == null)
+				throw new ArgumentNullException ("target");
 
-			lock (this.buddyLists)
-				this.buddyLists.Remove (listOwner, buddyId);
+			lock (this.watchLists)
+				this.watchLists.Remove (listOwner, target);
 
 			return Task.FromResult (true);
 		}
 
-		public Task<IEnumerable<string>> GetWatchedAsync (string listOwner)
+		public Task<IEnumerable<Person>> GetWatchedAsync (string listOwner)
 		{
 			if (listOwner == null)
 				throw new ArgumentNullException ("listOwner");
 
-			string[] buddies;
-			lock (this.buddyLists)
-				buddies = this.buddyLists[listOwner].ToArray();
+			Person[] buddies;
+			lock (this.watchLists)
+				buddies = this.watchLists[listOwner].Select (s => people[s]).ToArray();
 
-			return Task.FromResult<IEnumerable<string>> (buddies);
+			return Task.FromResult<IEnumerable<Person>> (buddies);
 		}
 
-		public Task<IEnumerable<string>> GetWatchersAsync (string target)
+		public Task<IEnumerable<Person>> GetWatchersAsync (string target)
 		{
 			if (target == null)
 				throw new ArgumentNullException ("target");
 
-			string[] owners;
-			lock (this.buddyLists)
-				owners = this.buddyLists.Inverse[target].ToArray();
+			Person[] owners;
+			lock (this.watchLists)
+				owners = this.watchLists.Inverse[target].Select (s => people[s]).ToArray();
 
-			return Task.FromResult<IEnumerable<string>> (owners);
+			return Task.FromResult<IEnumerable<Person>> (owners);
 		}
 
-		private readonly BidirectionalLookup<string, string> buddyLists = new BidirectionalLookup<string, string>();
+		private readonly Dictionary<string, Person> people = new Dictionary<string, Person>();
+		private readonly BidirectionalLookup<string, string> watchLists = new BidirectionalLookup<string, string>();
 	}
 }
