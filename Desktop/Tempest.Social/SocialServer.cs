@@ -26,6 +26,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Threading.Tasks;
+using Cadenza.Collections;
 
 namespace Tempest.Social
 {
@@ -42,11 +46,122 @@ namespace Tempest.Social
 
 			this.provider = provider;
 			this.identityProvider = identityProvider;
+
 			this.RegisterMessageHandler<PersonMessage> (OnPersonMessage);
+			this.RegisterMessageHandler<BuddyListMessage> (OnBuddyListMessage );
 		}
 
 		private readonly IWatchListProvider provider;
 		private readonly IIdentityProvider identityProvider;
+		
+		private readonly object sync = new object();
+		private readonly Dictionary<string, Person> people = new Dictionary<string, Person>();
+		private readonly BidirectionalDictionary<string, IConnection> connections = new BidirectionalDictionary<string, IConnection>();
+		
+		private async Task<Person> GetPerson (IConnection connection)
+		{
+			string identity;
+			bool found = false;
+			lock (this.sync)
+				found = this.connections.TryGetKey (connection, out identity);
 
+			if (!found)
+				identity = await this.identityProvider.GetIdentityAsync (connection);
+
+			Person person;
+			lock (this.sync)
+			{
+				if (!this.people.TryGetValue (identity, out person))
+					this.people[identity] = person = new Person (identity);
+			}
+
+			if (person.Identity != identity)
+				return null;
+
+			return person;
+		}
+
+		private async void OnBuddyListMessage (MessageEventArgs<BuddyListMessage> e)
+		{
+			Person owner = await GetPerson (e.Connection);
+			if (owner == null)
+			{
+				e.Connection.Disconnect (ConnectionResult.Custom, "Identity not found or verified");
+				return;
+			}
+
+			switch (e.Message.ChangeAction)
+			{
+				case NotifyCollectionChangedAction.Add:
+					this.provider.AddRangeAsync (owner, e.Message.People);
+					break;
+
+				case NotifyCollectionChangedAction.Remove:
+					foreach (Person person in e.Message.People)
+						await this.provider.RemoveAsync (owner.Identity, person.Identity);
+
+					break;
+
+				case NotifyCollectionChangedAction.Reset:
+					await this.provider.ClearAsync (owner.Identity);
+					this.provider.AddRangeAsync (owner, e.Message.People);
+					break;
+			}
+		}
+
+		private async void OnPersonMessage (MessageEventArgs<PersonMessage> e)
+		{
+			string identity = await this.identityProvider.GetIdentityAsync (e.Connection);
+			if (identity == null || identity != e.Message.Person.Identity)
+			{
+				e.Connection.Disconnect (ConnectionResult.Custom, "Identity not found or verified");
+				return;
+			}
+
+			bool justJoined = false;
+			lock (this.sync)
+			{
+				Person person;
+				if (this.people.TryGetValue (identity, out person))
+				{
+					person.Nickname = e.Message.Person.Nickname;
+					person.Status = e.Message.Person.Status;
+				}
+				else
+				{
+					this.connections[identity] = e.Connection;
+					this.people[identity] = e.Message.Person;
+					justJoined = true;
+				}
+			}
+
+			if (justJoined)
+			{
+				IEnumerable<Person> watched = await this.provider.GetWatchedAsync (identity);
+
+				if (watched == null || !watched.Any())
+					e.Connection.Send (new RequestBuddyListMessage());
+				else
+				{
+					e.Connection.Send (new BuddyListMessage
+					{
+						ChangeAction = NotifyCollectionChangedAction.Reset,
+						People = watched
+					});
+				}
+			}
+
+			foreach (Person watcher in await this.provider.GetWatchersAsync (identity))
+			{
+				IConnection connection;
+				lock (this.sync)
+				{
+					if (!this.connections.TryGetValue (watcher.Identity, out connection))
+						continue;
+				}
+
+				connection.Send (new PersonMessage { Person = e.Message.Person });
+			}
+		}
 	}
 }
