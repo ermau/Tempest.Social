@@ -78,6 +78,13 @@ namespace Tempest.Social
 		private readonly WatchList watchList;
 		private readonly Person persona;
 
+		protected override void OnConnected (ClientConnectionEventArgs e)
+		{
+			Connection.Send (new PersonMessage { Person = Persona });
+
+			base.OnConnected (e);
+		}
+
 		private void OnRequestBuddyListMessage (MessageEventArgs<RequestBuddyListMessage> e)
 		{
 			OnBuddyListRequested();
