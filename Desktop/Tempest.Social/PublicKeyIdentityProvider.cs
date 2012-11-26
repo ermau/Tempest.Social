@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Tempest.Social
@@ -39,7 +40,11 @@ namespace Tempest.Social
 			if (connection.RemoteKey == null || connection.RemoteKey.PublicSignature == null)
 				throw new ArgumentException ("Invalid remote key or public signature");
 
-			string fingerprint = Convert.ToString (connection.RemoteKey.PublicSignature);
+			StringBuilder builder = new StringBuilder (connection.RemoteKey.PublicSignature.Length * 2);
+			foreach (byte b in connection.RemoteKey.PublicSignature)
+				builder.Append (b.ToString ("X2"));
+
+			string fingerprint = builder.ToString();
 			return Task.FromResult (fingerprint);
 		}
 	}
