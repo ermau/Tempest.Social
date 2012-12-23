@@ -20,18 +20,24 @@ namespace Tempest.Social.Server
 
 			var provider = new NetworkConnectionProvider (
 				new[] { SocialProtocol.Instance },
-				new IPEndPoint (IPAddress.Any, 53121),
+				new IPEndPoint (IPAddress.Any, SocialProtocol.DefaultPort),
 				10000,
 				() => new RSACrypto(),
 				key);
 
 			SocialServer server = new SocialServer (new MemoryWatchListProvider(), IdentityProvider);
+			server.ConnectionMade += OnConnectionMade;
 			server.AddConnectionProvider (provider);
 			server.Start();
 
 			Console.WriteLine ("Server ready.");
 
 			while (Console.ReadLine() != "exit") ;
+		}
+
+		private static void OnConnectionMade (object sender, ConnectionMadeEventArgs e)
+		{
+			Console.WriteLine ("Connection made");
 		}
 
 		private static IAsymmetricKey GetKey (string path)
@@ -47,7 +53,7 @@ namespace Tempest.Social.Server
 
 			if (key == null)
 			{
-				using (FileStream stream = File.OpenRead ("client.key"))
+				using (FileStream stream = File.OpenRead (path))
 					key = new RSAAsymmetricKey (null, new StreamValueReader (stream));
 			}
 
