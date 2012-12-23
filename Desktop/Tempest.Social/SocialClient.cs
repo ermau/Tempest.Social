@@ -25,11 +25,55 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace Tempest.Social
 {
+	public class ConnectRequestEventArgs
+		: EventArgs
+	{
+		public ConnectRequestEventArgs (Person person, EndPoint endPoint, bool youreHosting)
+		{
+			if (person == null)
+				throw new ArgumentNullException ("person");
+			if (endPoint == null)
+				throw new ArgumentNullException ("endPoint");
+
+			Person = person;
+			EndPoint = endPoint;
+			YoureHosting = youreHosting;
+		}
+
+		/// <summary>
+		/// Gets the person you're to connect to.
+		/// </summary>
+		public Person Person
+		{
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// The endpoint to connect to or receive a connection from.
+		/// </summary>
+		public EndPoint EndPoint
+		{
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// Gets whether or not the server picked you as the host.
+		/// </summary>
+		public bool YoureHosting
+		{
+			get;
+			private set;
+		}
+	}
+
 	public class SocialClient
 		: LocalClient
 	{
@@ -40,8 +84,10 @@ namespace Tempest.Social
 				throw new ArgumentNullException ("persona");
 
 			this.watchList = new WatchList (this);
-			this.RegisterMessageHandler<RequestBuddyListMessage> (OnRequestBuddyListMessage);
 			this.persona = persona;
+
+			this.RegisterMessageHandler<RequestBuddyListMessage> (OnRequestBuddyListMessage);
+			this.RegisterMessageHandler<ConnectToMessage> (OnConnectToMessage);
 		}
 
 		/// <summary>
@@ -54,7 +100,12 @@ namespace Tempest.Social
 		/// <para>This event is also an indication that you should record your buddy list
 		/// locally.</para>
 		/// </remarks>
-		public event EventHandler BuddyListRequested;
+		public event EventHandler WatchListRequested;
+
+		/// <summary>
+		/// A connect request was received.
+		/// </summary>
+		public event EventHandler<ConnectRequestEventArgs> ConnectionRequest;
 
 		public Person Persona
 		{
@@ -66,13 +117,31 @@ namespace Tempest.Social
 			get { return this.watchList; }
 		}
 
-		public Task<EndPoint> RequestEndPointAsync (string identity)
+		public async Task<ConnectResult> RequestEndPointAsync (string identity)
 		{
 			if (identity == null)
 				throw new ArgumentNullException ("identity");
 
-			return Connection.SendFor<EndPointResultMessage> (new EndPointRequestMessage { Identity = identity })
-			                 .ContinueWith (t => t.Result.EndPoint);
+			var response = await Connection.SendFor<ConnectResultMessage> (new ConnectRequestMessage { Identity = identity }).ConfigureAwait (false);
+			return response.Result;
+		}
+
+		/// <summary>
+		/// Searches for users with a similar <paramref name="nickname"/>.
+		/// </summary>
+		/// <param name="nickname">The nickname to search for.</param>
+		/// <returns>Any users that at least partially match the nickname.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="nickname"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="nickname"/> is empty.</exception>
+		public async Task<IEnumerable<Person>> SearchAsync (string nickname)
+		{
+			if (nickname == null)
+				throw new ArgumentNullException ("nickname");
+			if (nickname.Trim() == String.Empty)
+				throw new ArgumentException ("nickname can not be empty", "nickname");
+
+			var response = await Connection.SendFor<SearchResultMessage> (new SearchMessage { Nickname = nickname }).ConfigureAwait (false);
+			return response.Results;
 		}
 
 		private readonly WatchList watchList;
@@ -90,11 +159,27 @@ namespace Tempest.Social
 			OnBuddyListRequested();
 		}
 
+		private void OnConnectToMessage (MessageEventArgs<ConnectToMessage> e)
+		{
+			Person person;
+			if (!WatchList.TryGetPerson (e.Message.Id, out person))
+				return;
+
+			OnConnectionRequest (new ConnectRequestEventArgs (person, e.Message.EndPoint, e.Message.YoureHosting));
+		}
+
 		private void OnBuddyListRequested ()
 		{
-			var handler = BuddyListRequested;
+			var handler = this.WatchListRequested;
 			if (handler != null)
 				handler (this, EventArgs.Empty);
+		}
+
+		private void OnConnectionRequest (ConnectRequestEventArgs e)
+		{
+			var handler = ConnectionRequest;
+			if (handler != null)
+				handler (this, e);
 		}
 	}
 }

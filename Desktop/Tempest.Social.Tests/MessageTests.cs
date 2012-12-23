@@ -24,6 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
@@ -36,22 +37,42 @@ namespace Tempest.Social.Tests
 	public class MessageTests
 	{
 		[Test]
-		public void EndPointRequestMessage()
+		public void ConnectRequestMessage()
 		{
 			const string identity = "identity";
-			var msg = new EndPointRequestMessage { Identity = identity };
+			var msg = new ConnectRequestMessage { Identity = identity };
 
 			msg = msg.AssertLengthMatches();
 			Assert.AreEqual (identity, msg.Identity);
 		}
 
 		[Test]
-		public void EndPointResultMessage()
+		public void ConnectResultMessage()
 		{
-			IPEndPoint endPoint = new IPEndPoint (IPAddress.Loopback, 42);
-			var msg = new EndPointResultMessage { EndPoint = endPoint };
+			ConnectResult result = ConnectResult.FailedNotFound;
+			var msg = new ConnectResultMessage (result);
 
 			msg = msg.AssertLengthMatches();
+			Assert.AreEqual (result, msg.Result);
+		}
+
+		[Test]
+		public void ConnectToMessage()
+		{
+			IPEndPoint endPoint = new IPEndPoint (IPAddress.Loopback, 42);
+			var msg = new ConnectToMessage { EndPoint = endPoint };
+
+			msg = msg.AssertLengthMatches();
+			Assert.AreEqual (endPoint, msg.EndPoint);
+		}
+
+		[Test]
+		public void ConnectToMessage_Ctor()
+		{
+			Assert.Throws<ArgumentNullException> (() => new ConnectToMessage (null));
+
+			IPEndPoint endPoint = new IPEndPoint (IPAddress.Loopback, 42);
+			var msg = new ConnectToMessage (endPoint);
 			Assert.AreEqual (endPoint, msg.EndPoint);
 		}
 
@@ -101,6 +122,16 @@ namespace Tempest.Social.Tests
 			Assert.AreEqual (p2.Identity, people[1].Identity);
 			Assert.AreEqual (p2.Nickname, people[1].Nickname);
 			Assert.AreEqual (p2.Status, people[1].Status);
+		}
+
+		[Test]
+		public void SearchMessage()
+		{
+			const string nick = "ermau";
+			var msg = new SearchMessage { Nickname = nick };
+
+			msg = msg.AssertLengthMatches();
+			Assert.AreEqual (nick, msg.Nickname);
 		}
 	}
 }

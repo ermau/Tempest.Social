@@ -1,5 +1,5 @@
 ﻿//
-// SocialMessage.cs
+// ConnectResultMessage.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -24,54 +24,54 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+
 namespace Tempest.Social
 {
-	public enum SocialMessageType
-		: ushort
+	public enum ConnectResult
+		: byte
 	{
-		/// <summary>
-		/// Sent from the server to client to indicate it does not have a buddy list for this person.
-		/// </summary>
-		RequestBuddyList = 1,
-		
-		/// <summary>
-		/// Sent from the server or client to update buddy lists.
-		/// </summary>
-		BuddyList = 2,
-		
-		/// <summary>
-		/// Updates a person's attributes, including your own.
-		/// </summary>
-		Person = 3,
+		FailedUnknown = 0,
+		Success = 1,
 
 		/// <summary>
-		/// Request to be connected with another user.
+		/// The person you tried to connec to was not found
 		/// </summary>
-		ConnectRequest = 4,
-		ConnectResult = 5,
-		ConnectTo = 6,
-		
-		Search = 7,
-		SearchResult = 8
+		FailedNotFound = 2,
+
+		/// <summary>
+		/// You are not following the person you tried to connect to
+		/// </summary>
+		FailedNotFollowing = 3
 	}
 
-	public abstract class SocialMessage
-		: Message
+	public class ConnectResultMessage
+		: SocialMessage
 	{
-		protected SocialMessage (SocialMessageType type)
-			: base (SocialProtocol.Instance, (ushort)type)
+		public ConnectResultMessage()
+			: base (SocialMessageType.ConnectResult)
 		{
 		}
-	}
 
-	public static class SocialProtocol
-	{
-		public static readonly Protocol Instance = new Protocol (2, 1);
-		public const int DefaultPort = 42920;
-
-		static SocialProtocol()
+		public ConnectResultMessage (ConnectResult result)
+			: this()
 		{
-			Instance.DiscoverFromAssemblyOf<SocialMessage>();
+			Result = result;
+		}
+
+		public ConnectResult Result
+		{
+			get;
+			set;
+		}
+
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
+		{
+			writer.WriteByte ((byte)Result);
+		}
+
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
+		{
+			Result = (ConnectResult)reader.ReadByte();
 		}
 	}
 }

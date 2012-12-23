@@ -1,5 +1,5 @@
 ﻿//
-// EndPointRequestMessage.cs
+// ConnectToMessage.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -24,17 +24,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+using System.Net;
+
 namespace Tempest.Social
 {
-	public class EndPointRequestMessage
+	public class ConnectToMessage
 		: SocialMessage
 	{
-		public EndPointRequestMessage()
-			: base (SocialMessageType.EndPointRequest)
+		public ConnectToMessage()
+			: base (SocialMessageType.ConnectTo)
 		{
 		}
 
-		public string Identity
+		public ConnectToMessage (EndPoint endPoint)
+			: this()
+		{
+			if (endPoint == null)
+				throw new ArgumentNullException ("endPoint");
+
+			EndPoint = endPoint;
+		}
+
+		/// <summary>
+		/// Gets or sets whether this connection client is to be the host.
+		/// </summary>
+		public bool YoureHosting
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Gets or sets the ID of the person to connect to.
+		/// </summary>
+		public string Id
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Gets or sets the end point to connect to or receive a connection from.
+		/// </summary>
+		public EndPoint EndPoint
 		{
 			get;
 			set;
@@ -42,12 +75,16 @@ namespace Tempest.Social
 
 		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
-			writer.WriteString (Identity);
+			writer.WriteString (Id);
+			writer.Write (context, EndPoint);
+			writer.WriteBool (YoureHosting);
 		}
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
-			Identity = reader.ReadString();
+			Id = reader.ReadString();
+			YoureHosting = reader.ReadBool();
+			EndPoint = reader.Read<EndPoint> (context);
 		}
 	}
 }

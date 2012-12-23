@@ -1,5 +1,5 @@
 ﻿//
-// EndPointResultMessage.cs
+// ConnectRequestMessage.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -24,19 +24,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Net;
-
 namespace Tempest.Social
 {
-	public class EndPointResultMessage
+	public class ConnectRequestMessage
 		: SocialMessage
 	{
-		public EndPointResultMessage()
-			: base (SocialMessageType.EndPointResult)
+		public ConnectRequestMessage()
+			: base (SocialMessageType.ConnectRequest)
 		{
 		}
 
-		public EndPoint EndPoint
+		public string Identity
 		{
 			get;
 			set;
@@ -44,14 +42,12 @@ namespace Tempest.Social
 
 		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
-			if (writer.WriteBool (EndPoint != null))
-				writer.Write (context, EndPoint);
+			writer.WriteString (Identity);
 		}
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
-			if (reader.ReadBool())
-				EndPoint = reader.Read<EndPoint> (context);
+			Identity = reader.ReadString();
 		}
 	}
 }

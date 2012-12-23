@@ -42,7 +42,7 @@ namespace Tempest.Social
 				throw new ArgumentNullException ("clientContext");
 			
 			this.clientContext = clientContext;
-			this.clientContext.RegisterMessageHandler<PersonMessage> (OnPersonMessage );
+			this.clientContext.RegisterMessageHandler<PersonMessage> (OnPersonMessage);
 			this.clientContext.RegisterMessageHandler<BuddyListMessage> (OnBuddyListMessage);
 		}
 
@@ -92,10 +92,13 @@ namespace Tempest.Social
 
 		public bool Remove (Person item)
 		{
+			bool removed;
 			lock (this.people)
-				return this.people.Remove (item);
+				removed = this.people.Remove (item);
 
 			Send (NotifyCollectionChangedAction.Remove, item);
+
+			return removed;
 		}
 
 		public bool TryGetPerson (string identity, out Person person)

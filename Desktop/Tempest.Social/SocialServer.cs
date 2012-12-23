@@ -48,7 +48,9 @@ namespace Tempest.Social
 			this.identityProvider = identityProvider;
 
 			this.RegisterMessageHandler<PersonMessage> (OnPersonMessage);
-			this.RegisterMessageHandler<BuddyListMessage> (OnBuddyListMessage );
+			this.RegisterMessageHandler<BuddyListMessage> (OnBuddyListMessage);
+			this.RegisterMessageHandler<ConnectRequestMessage> (OnConnectRequestMessage);
+			this.RegisterMessageHandler<SearchMessage> (OnSearchMessage);
 		}
 
 		private readonly IWatchListProvider provider;
@@ -61,7 +63,7 @@ namespace Tempest.Social
 		private async Task<Person> GetPerson (IConnection connection)
 		{
 			string identity;
-			bool found = false;
+			bool found;
 			lock (this.sync)
 				found = this.connections.TryGetKey (connection, out identity);
 
@@ -81,6 +83,68 @@ namespace Tempest.Social
 			return person;
 		}
 
+		private void OnSearchMessage (MessageEventArgs<SearchMessage> e)
+		{
+			string nickname = e.Message.Nickname;
+			if (String.IsNullOrWhiteSpace (nickname))
+			{
+				e.Connection.SendResponse (e.Message, new SearchResultMessage (Enumerable.Empty<Person>()));
+				return;
+			}
+
+			nickname = nickname.ToLower();
+
+			Person[] pool;
+			lock (this.sync)
+				pool = this.people.Values.ToArray();
+
+			List<Person> results = new List<Person>();
+			foreach (Person person in pool)
+			{
+				if (person.Nickname.ToLower().Contains (nickname))
+					results.Add (person);
+			}
+
+			e.Connection.SendResponse (e.Message, new SearchResultMessage (results));
+		}
+
+		private async void OnConnectRequestMessage (MessageEventArgs<ConnectRequestMessage> e)
+		{
+			Person owner = await GetPerson (e.Connection);
+			if (owner == null)
+			{
+				e.Connection.Disconnect (ConnectionResult.Custom, "Identity not found or verified");
+				return;
+			}
+
+			bool found;
+			Person target;
+			IConnection targetConnection = null;
+			lock (this.sync)
+			{
+				found = this.people.TryGetValue (e.Message.Identity, out target);
+				if (found)
+					targetConnection = this.connections[target.Identity];
+			}
+
+			if (!found)
+			{
+				e.Connection.SendResponse (e.Message, new ConnectResultMessage (ConnectResult.FailedNotFound));
+				return;
+			}
+
+			var watchers = await provider.GetWatchedAsync (owner.Identity).ConfigureAwait (false);
+			if (!watchers.Contains (target))
+			{
+				e.Connection.SendResponse (e.Message, new ConnectResultMessage (ConnectResult.FailedNotFollowing));
+				return;
+			}
+
+			e.Connection.SendResponse (e.Message, new ConnectResultMessage (ConnectResult.Success));
+			e.Connection.Send (new ConnectToMessage (targetConnection.RemoteEndPoint));
+			targetConnection.Send (new ConnectToMessage (e.Connection.RemoteEndPoint));
+		}
+
 		private async void OnBuddyListMessage (MessageEventArgs<BuddyListMessage> e)
 		{
 			Person owner = await GetPerson (e.Connection);
@@ -93,7 +157,7 @@ namespace Tempest.Social
 			switch (e.Message.ChangeAction)
 			{
 				case NotifyCollectionChangedAction.Add:
-					this.provider.AddRangeAsync (owner, e.Message.People);
+					await this.provider.AddRangeAsync (owner, e.Message.People);
 					break;
 
 				case NotifyCollectionChangedAction.Remove:
@@ -104,7 +168,7 @@ namespace Tempest.Social
 
 				case NotifyCollectionChangedAction.Reset:
 					await this.provider.ClearAsync (owner.Identity);
-					this.provider.AddRangeAsync (owner, e.Message.People);
+					await this.provider.AddRangeAsync (owner, e.Message.People);
 					break;
 			}
 		}
