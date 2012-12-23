@@ -78,10 +78,13 @@ namespace Tempest.Social.Tests
 		[Test]
 		public void ConnectToMessage_Ctor()
 		{
-			Assert.Throws<ArgumentNullException> (() => new ConnectToMessage (null));
+			Assert.Throws<ArgumentNullException> (() => new ConnectToMessage (null, true, new IPEndPoint (IPAddress.Any, 100)));
+			Assert.Throws<ArgumentNullException> (() => new ConnectToMessage ("id", true, null));
 
 			IPEndPoint endPoint = new IPEndPoint (IPAddress.Loopback, 42);
-			var msg = new ConnectToMessage (endPoint);
+			var msg = new ConnectToMessage  ("id", true, endPoint);
+			Assert.AreEqual ("id", msg.Id);
+			Assert.AreEqual (true, msg.YoureHosting);
 			Assert.AreEqual (endPoint, msg.EndPoint);
 		}
 

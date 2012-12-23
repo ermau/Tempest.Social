@@ -141,8 +141,8 @@ namespace Tempest.Social
 			}
 
 			e.Connection.SendResponse (e.Message, new ConnectResultMessage (ConnectResult.Success));
-			e.Connection.Send (new ConnectToMessage (targetConnection.RemoteEndPoint));
-			targetConnection.Send (new ConnectToMessage (e.Connection.RemoteEndPoint));
+			e.Connection.Send (new ConnectToMessage (target.Identity, true, targetConnection.RemoteEndPoint));
+			targetConnection.Send (new ConnectToMessage (owner.Identity, false, e.Connection.RemoteEndPoint));
 		}
 
 		private async void OnBuddyListMessage (MessageEventArgs<BuddyListMessage> e)

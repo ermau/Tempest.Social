@@ -37,12 +37,16 @@ namespace Tempest.Social
 		{
 		}
 
-		public ConnectToMessage (EndPoint endPoint)
+		public ConnectToMessage (string id, bool youreHosting, EndPoint endPoint)
 			: this()
 		{
+			if (id == null)
+				throw new ArgumentNullException ("id");
 			if (endPoint == null)
 				throw new ArgumentNullException ("endPoint");
 
+			Id = id;
+			YoureHosting = youreHosting;
 			EndPoint = endPoint;
 		}
 
