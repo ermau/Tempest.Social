@@ -59,11 +59,20 @@ namespace Tempest.Social.Tests
 		[Test]
 		public void ConnectToMessage()
 		{
+			const string id = "name";
+
 			IPEndPoint endPoint = new IPEndPoint (IPAddress.Loopback, 42);
-			var msg = new ConnectToMessage { EndPoint = endPoint };
+			var msg = new ConnectToMessage
+			{
+				Id = id,
+				YoureHosting = true,
+				EndPoint = endPoint
+			};
 
 			msg = msg.AssertLengthMatches();
 			Assert.AreEqual (endPoint, msg.EndPoint);
+			Assert.AreEqual (id, msg.Id);
+			Assert.AreEqual (true, msg.YoureHosting);
 		}
 
 		[Test]

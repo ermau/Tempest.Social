@@ -76,8 +76,8 @@ namespace Tempest.Social
 		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteString (Id);
-			writer.Write (context, EndPoint);
 			writer.WriteBool (YoureHosting);
+			writer.Write (context, EndPoint);
 		}
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
