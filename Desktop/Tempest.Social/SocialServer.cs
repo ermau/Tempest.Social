@@ -134,7 +134,7 @@ namespace Tempest.Social
 			}
 
 			var watchers = await provider.GetWatchedAsync (owner.Identity).ConfigureAwait (false);
-			if (!watchers.Contains (target))
+			if (!watchers.Any (p => p.Identity == target.Identity))
 			{
 				e.Connection.SendResponse (e.Message, new ConnectResultMessage (ConnectResult.FailedNotFollowing));
 				return;
