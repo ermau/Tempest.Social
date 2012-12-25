@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -85,6 +86,7 @@ namespace Tempest.Social
 
 			this.watchList = new WatchList (this);
 			this.persona = persona;
+			this.persona.PropertyChanged += OnPersonaPropertyChanged;
 
 			this.RegisterMessageHandler<RequestBuddyListMessage> (OnRequestBuddyListMessage);
 			this.RegisterMessageHandler<ConnectToMessage> (OnConnectToMessage);
@@ -146,6 +148,11 @@ namespace Tempest.Social
 
 		private readonly WatchList watchList;
 		private readonly Person persona;
+
+		private void OnPersonaPropertyChanged (object sender, PropertyChangedEventArgs e)
+		{
+			Connection.Send (new PersonMessage (this.persona));
+		}
 
 		protected override void OnConnected (ClientConnectionEventArgs e)
 		{

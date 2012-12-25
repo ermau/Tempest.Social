@@ -24,6 +24,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+
 namespace Tempest.Social
 {
 	public class PersonMessage
@@ -32,6 +34,15 @@ namespace Tempest.Social
 		public PersonMessage()
 			: base (SocialMessageType.Person)
 		{
+		}
+
+		public PersonMessage (Person persona)
+			: this()
+		{
+			if (persona == null)
+				throw new ArgumentNullException ("persona");
+
+			Person = persona;
 		}
 
 		public override bool Authenticated
