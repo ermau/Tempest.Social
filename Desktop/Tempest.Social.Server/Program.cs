@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 using Tempest.Providers.Network;
 
 namespace Tempest.Social.Server
@@ -32,7 +33,8 @@ namespace Tempest.Social.Server
 
 			Console.WriteLine ("Server ready.");
 
-			while (Console.ReadLine() != "exit") ;
+			while (true)
+				Thread.Sleep (1000);
 		}
 
 		private static void OnConnectionMade (object sender, ConnectionMadeEventArgs e)
