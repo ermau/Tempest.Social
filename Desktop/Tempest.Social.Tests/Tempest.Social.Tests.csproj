@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PersonIdentityEqualityComparerTests.cs" />
     <Compile Include="WatchListProviderTests.cs" />
     <Compile Include="BuddyListTests.cs" />
     <Compile Include="IdentityProviderTests.cs" />
