@@ -81,7 +81,7 @@ namespace Tempest.Social
 			get { return this.watchList; }
 		}
 
-		public async Task<ConnectResult> RequestEndPointAsync (string identity)
+		public async Task<ConnectResult> ConnectToPersonAsync (string identity)
 		{
 			if (identity == null)
 				throw new ArgumentNullException ("identity");
