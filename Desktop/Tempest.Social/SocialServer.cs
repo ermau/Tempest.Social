@@ -140,9 +140,15 @@ namespace Tempest.Social
 				return;
 			}
 
-			e.Connection.SendResponse (e.Message, new ConnectResultMessage (ConnectResult.Success));
-			e.Connection.Send (new ConnectToMessage (target.Identity, true, targetConnection.RemoteEndPoint));
-			targetConnection.Send (new ConnectToMessage (owner.Identity, false, e.Connection.RemoteEndPoint));
+			var msg = await targetConnection.SendFor<ConnectResultMessage> (new ConnectRequestMessage { Identity = owner.Identity }).ConfigureAwait (false);
+			
+			e.Connection.SendResponse (e.Message, msg);
+
+			if (msg.Result == ConnectResult.Success)
+			{
+				e.Connection.Send (new ConnectToMessage (target.Identity, true, targetConnection.RemoteEndPoint));
+				targetConnection.Send (new ConnectToMessage (owner.Identity, false, e.Connection.RemoteEndPoint));
+			}
 		}
 
 		private async void OnBuddyListMessage (MessageEventArgs<BuddyListMessage> e)

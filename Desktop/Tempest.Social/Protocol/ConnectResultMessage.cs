@@ -34,14 +34,19 @@ namespace Tempest.Social
 		Success = 1,
 
 		/// <summary>
-		/// The person you tried to connec to was not found
+		/// The person you tried to connec to was not found.
 		/// </summary>
 		FailedNotFound = 2,
 
 		/// <summary>
-		/// You are not following the person you tried to connect to
+		/// You are not following the person you tried to connect to.
 		/// </summary>
-		FailedNotFollowing = 3
+		FailedNotFollowing = 3,
+
+		/// <summary>
+		/// The other party rejected the connection.
+		/// </summary>
+		FailedRejected = 4
 	}
 
 	public class ConnectResultMessage

@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConnectEventArgs.cs" />
     <Compile Include="Protocol\ConnectRequestMessage.cs" />
     <Compile Include="Protocol\ConnectResultMessage.cs" />
     <Compile Include="Protocol\ConnectToMessage.cs" />

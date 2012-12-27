@@ -27,54 +27,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Tempest.Social
 {
-	public class ConnectRequestEventArgs
-		: EventArgs
-	{
-		public ConnectRequestEventArgs (Person person, EndPoint endPoint, bool youreHosting)
-		{
-			if (person == null)
-				throw new ArgumentNullException ("person");
-			if (endPoint == null)
-				throw new ArgumentNullException ("endPoint");
-
-			Person = person;
-			EndPoint = endPoint;
-			YoureHosting = youreHosting;
-		}
-
-		/// <summary>
-		/// Gets the person you're to connect to.
-		/// </summary>
-		public Person Person
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// The endpoint to connect to or receive a connection from.
-		/// </summary>
-		public EndPoint EndPoint
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets whether or not the server picked you as the host.
-		/// </summary>
-		public bool YoureHosting
-		{
-			get;
-			private set;
-		}
-	}
-
 	public class SocialClient
 		: LocalClient
 	{
@@ -89,6 +45,7 @@ namespace Tempest.Social
 			this.persona.PropertyChanged += OnPersonaPropertyChanged;
 
 			this.RegisterMessageHandler<RequestBuddyListMessage> (OnRequestBuddyListMessage);
+			this.RegisterMessageHandler<ConnectRequestMessage> (OnConnectRequestMessage);
 			this.RegisterMessageHandler<ConnectToMessage> (OnConnectToMessage);
 		}
 
@@ -107,7 +64,12 @@ namespace Tempest.Social
 		/// <summary>
 		/// A connect request was received.
 		/// </summary>
-		public event EventHandler<ConnectRequestEventArgs> ConnectionRequest;
+		public event EventHandler<RequestConnectEventArgs> ConnectionRequest;
+
+		/// <summary>
+		/// Raised when a connection has been requested and accepted between you and another party.
+		/// </summary>
+		public event EventHandler<ConnectEventArgs> StartingConnection;
 
 		public Person Persona
 		{
@@ -161,18 +123,49 @@ namespace Tempest.Social
 			base.OnConnected (e);
 		}
 
+		private void OnConnectRequestMessage (MessageEventArgs<ConnectRequestMessage> e)
+		{
+			// Let's not block the network by waiting
+			Task.Factory.StartNew (s =>
+			{
+				ConnectRequestMessage msg = (ConnectRequestMessage)s;
+
+				Person p;
+				if (!this.watchList.TryGetPerson (msg.Identity, out p))
+					return;
+
+				var args = new RequestConnectEventArgs (p);
+				OnConnectionRequest (args);
+
+				Connection.SendResponse (msg,
+					new ConnectResultMessage ((args.Accept) ? ConnectResult.Success : ConnectResult.FailedRejected));
+			}, e.Message);
+		}
+
 		private void OnRequestBuddyListMessage (MessageEventArgs<RequestBuddyListMessage> e)
 		{
-			OnBuddyListRequested();
+			Task.Factory.StartNew (OnBuddyListRequested);
 		}
 
 		private void OnConnectToMessage (MessageEventArgs<ConnectToMessage> e)
 		{
-			Person person;
-			if (!WatchList.TryGetPerson (e.Message.Id, out person))
-				return;
+			Task.Factory.StartNew (s =>
+			{
+				var msg = (ConnectToMessage)s;
 
-			OnConnectionRequest (new ConnectRequestEventArgs (person, e.Message.EndPoint, e.Message.YoureHosting));
+				Person person;
+				if (!WatchList.TryGetPerson (e.Message.Id, out person))
+					return;
+
+				OnStartingConnection (new ConnectEventArgs (person, msg.EndPoint, msg.YoureHosting));
+			}, e.Message);
+		}
+
+		protected void OnStartingConnection (ConnectEventArgs e)
+		{
+			var handler = StartingConnection;
+			if (handler != null)
+				handler (this, e);
 		}
 
 		private void OnBuddyListRequested ()
@@ -182,7 +175,7 @@ namespace Tempest.Social
 				handler (this, EventArgs.Empty);
 		}
 
-		private void OnConnectionRequest (ConnectRequestEventArgs e)
+		private void OnConnectionRequest (RequestConnectEventArgs e)
 		{
 			var handler = ConnectionRequest;
 			if (handler != null)
