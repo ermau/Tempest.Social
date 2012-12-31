@@ -25,6 +25,8 @@
 // THE SOFTWARE.
 
 
+using System;
+
 namespace Tempest.Social
 {
 	public enum ConnectResult
@@ -57,10 +59,16 @@ namespace Tempest.Social
 		{
 		}
 
-		public ConnectResultMessage (ConnectResult result)
+		public ConnectResultMessage (ConnectResult result, Target target)
 			: this()
 		{
+			if (!Enum.IsDefined (typeof (ConnectResult), result))
+				throw new ArgumentException ("result");
+			if (result == ConnectResult.Success && target == null)
+				throw new ArgumentNullException ("target");
+
 			Result = result;
+			Target = target;
 		}
 
 		public ConnectResult Result
@@ -69,14 +77,24 @@ namespace Tempest.Social
 			set;
 		}
 
+		public Target Target
+		{
+			get;
+			set;
+		}
+
 		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteByte ((byte)Result);
+			if (writer.WriteBool (Target != null))
+				Target.Serialize (context, writer);
 		}
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			Result = (ConnectResult)reader.ReadByte();
+			if (reader.ReadBool())
+				Target = new Target (context, reader);
 		}
 	}
 }

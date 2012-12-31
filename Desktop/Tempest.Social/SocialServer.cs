@@ -129,22 +129,23 @@ namespace Tempest.Social
 
 			if (!found)
 			{
-				e.Connection.SendResponseAsync (e.Message, new ConnectResultMessage (ConnectResult.FailedNotFound));
+				e.Connection.SendResponseAsync (e.Message, new ConnectResultMessage (ConnectResult.FailedNotFound, null));
 				return;
 			}
 
 			var watchers = await provider.GetWatchedAsync (owner.Identity).ConfigureAwait (false);
 			if (!watchers.Any (p => p.Identity == target.Identity))
 			{
-				e.Connection.SendResponseAsync (e.Message, new ConnectResultMessage (ConnectResult.FailedNotFollowing));
+				e.Connection.SendResponseAsync (e.Message, new ConnectResultMessage (ConnectResult.FailedNotFollowing, null));
 				return;
 			}
 
-			var msg = await targetConnection.SendFor<ConnectResultMessage> (new ConnectRequestMessage { Identity = owner.Identity }).ConfigureAwait (false);
+			var request = new ConnectRequestMessage (e.Message.Identity, e.Message.Target);
+			var response = await targetConnection.SendFor<ConnectResultMessage> (request).ConfigureAwait (false);
 			
-			e.Connection.SendResponseAsync (e.Message, msg);
+			e.Connection.SendResponseAsync (e.Message, response);
 
-			if (msg.Result == ConnectResult.Success)
+			if (response.Result == ConnectResult.Success)
 			{
 				e.Connection.SendAsync (new ConnectToMessage (target.Identity, true, targetConnection.RemoteTarget));
 				targetConnection.SendAsync (new ConnectToMessage (owner.Identity, false, e.Connection.RemoteTarget));

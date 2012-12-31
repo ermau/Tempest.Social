@@ -40,20 +40,27 @@ namespace Tempest.Social.Tests
 		public void ConnectRequestMessage()
 		{
 			const string identity = "identity";
-			var msg = new ConnectRequestMessage { Identity = identity };
+			Target target = new Target (Target.LoopbackIP, 42);
+			var msg = new ConnectRequestMessage (identity, target);
 
 			msg = msg.AssertLengthMatches();
 			Assert.AreEqual (identity, msg.Identity);
+			Assert.AreEqual (target, msg.Target);
 		}
 
-		[Test]
-		public void ConnectResultMessage()
+		[TestCase (ConnectResult.FailedNotFound, null, 0)]
+		[TestCase (ConnectResult.Success, Target.LoopbackIP, 42)]
+		public void ConnectResultMessage (ConnectResult result, string host, int port)
 		{
-			ConnectResult result = ConnectResult.FailedNotFound;
-			var msg = new ConnectResultMessage (result);
+			Target target = null;
+			if (host != null)
+				target = new Target (host, port);
+
+			var msg = new ConnectResultMessage (result, target);
 
 			msg = msg.AssertLengthMatches();
 			Assert.AreEqual (result, msg.Result);
+			Assert.AreEqual (target, msg.Target);
 		}
 
 		[Test]

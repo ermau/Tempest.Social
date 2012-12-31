@@ -24,6 +24,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+
 namespace Tempest.Social
 {
 	public class ConnectRequestMessage
@@ -34,20 +36,43 @@ namespace Tempest.Social
 		{
 		}
 
+		public ConnectRequestMessage (string identity, Target target)
+			: this()
+		{
+			if (identity == null)
+				throw new ArgumentNullException ("identity");
+			if (target == null)
+				throw new ArgumentNullException ("target");
+
+			Identity = identity;
+			Target = target;
+		}
+
+		/// <summary>
+		/// Gets or sets the target for the other client to connect to.
+		/// </summary>
+		public Target Target
+		{
+			get;
+			private set;
+		}
+
 		public string Identity
 		{
 			get;
-			set;
+			private set;
 		}
 
 		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
 			writer.WriteString (Identity);
+			Target.Serialize (context, writer);
 		}
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			Identity = reader.ReadString();
+			Target = new Target (context, reader);
 		}
 	}
 }

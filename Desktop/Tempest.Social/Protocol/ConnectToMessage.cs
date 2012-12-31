@@ -25,7 +25,6 @@
 // THE SOFTWARE.
 
 using System;
-using System.Net;
 
 namespace Tempest.Social
 {

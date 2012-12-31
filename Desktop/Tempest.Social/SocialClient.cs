@@ -81,12 +81,15 @@ namespace Tempest.Social
 			get { return this.watchList; }
 		}
 
-		public async Task<ConnectResult> ConnectToPersonAsync (string identity)
+		public async Task<ConnectResult> ConnectToPersonAsync (string identity, Target localTarget)
 		{
 			if (identity == null)
 				throw new ArgumentNullException ("identity");
+			if (localTarget == null)
+				throw new ArgumentNullException ("localTarget");
 
-			var response = await Connection.SendFor<ConnectResultMessage> (new ConnectRequestMessage { Identity = identity }).ConfigureAwait (false);
+			var msg = new ConnectRequestMessage (identity, localTarget);
+			var response = await Connection.SendFor<ConnectResultMessage> (msg).ConfigureAwait (false);
 			return response.Result;
 		}
 
@@ -137,8 +140,8 @@ namespace Tempest.Social
 				var args = new RequestConnectEventArgs (p);
 				OnConnectionRequest (args);
 
-				Connection.SendResponseAsync (msg,
-					new ConnectResultMessage ((args.Accept) ? ConnectResult.Success : ConnectResult.FailedRejected));
+				ConnectResult result = (args.Accept) ? ConnectResult.Success : ConnectResult.FailedRejected;
+				Connection.SendResponseAsync (msg, new ConnectResultMessage (result, args.Target));
 			}, e.Message);
 		}
 
