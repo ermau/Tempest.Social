@@ -88,7 +88,7 @@ namespace Tempest.Social
 			string nickname = e.Message.Nickname;
 			if (String.IsNullOrWhiteSpace (nickname))
 			{
-				e.Connection.SendResponse (e.Message, new SearchResultMessage (Enumerable.Empty<Person>()));
+				e.Connection.SendResponseAsync (e.Message, new SearchResultMessage (Enumerable.Empty<Person>()));
 				return;
 			}
 
@@ -105,7 +105,7 @@ namespace Tempest.Social
 					results.Add (person);
 			}
 
-			e.Connection.SendResponse (e.Message, new SearchResultMessage (results));
+			e.Connection.SendResponseAsync (e.Message, new SearchResultMessage (results));
 		}
 
 		private async void OnConnectRequestMessage (MessageEventArgs<ConnectRequestMessage> e)
@@ -113,7 +113,7 @@ namespace Tempest.Social
 			Person owner = await GetPerson (e.Connection);
 			if (owner == null)
 			{
-				e.Connection.Disconnect (ConnectionResult.Custom, "Identity not found or verified");
+				e.Connection.DisconnectAsync (ConnectionResult.Custom, "Identity not found or verified");
 				return;
 			}
 
@@ -129,25 +129,25 @@ namespace Tempest.Social
 
 			if (!found)
 			{
-				e.Connection.SendResponse (e.Message, new ConnectResultMessage (ConnectResult.FailedNotFound));
+				e.Connection.SendResponseAsync (e.Message, new ConnectResultMessage (ConnectResult.FailedNotFound));
 				return;
 			}
 
 			var watchers = await provider.GetWatchedAsync (owner.Identity).ConfigureAwait (false);
 			if (!watchers.Any (p => p.Identity == target.Identity))
 			{
-				e.Connection.SendResponse (e.Message, new ConnectResultMessage (ConnectResult.FailedNotFollowing));
+				e.Connection.SendResponseAsync (e.Message, new ConnectResultMessage (ConnectResult.FailedNotFollowing));
 				return;
 			}
 
 			var msg = await targetConnection.SendFor<ConnectResultMessage> (new ConnectRequestMessage { Identity = owner.Identity }).ConfigureAwait (false);
 			
-			e.Connection.SendResponse (e.Message, msg);
+			e.Connection.SendResponseAsync (e.Message, msg);
 
 			if (msg.Result == ConnectResult.Success)
 			{
-				e.Connection.Send (new ConnectToMessage (target.Identity, true, targetConnection.RemoteEndPoint));
-				targetConnection.Send (new ConnectToMessage (owner.Identity, false, e.Connection.RemoteEndPoint));
+				e.Connection.SendAsync (new ConnectToMessage (target.Identity, true, targetConnection.RemoteTarget));
+				targetConnection.SendAsync (new ConnectToMessage (owner.Identity, false, e.Connection.RemoteTarget));
 			}
 		}
 
@@ -156,7 +156,7 @@ namespace Tempest.Social
 			Person owner = await GetPerson (e.Connection);
 			if (owner == null)
 			{
-				e.Connection.Disconnect (ConnectionResult.Custom, "Identity not found or verified");
+				e.Connection.DisconnectAsync (ConnectionResult.Custom, "Identity not found or verified");
 				return;
 			}
 
@@ -184,7 +184,7 @@ namespace Tempest.Social
 			string identity = await this.identityProvider.GetIdentityAsync (e.Connection);
 			if (identity == null || identity != e.Message.Person.Identity)
 			{
-				e.Connection.Disconnect (ConnectionResult.Custom, "Identity not found or verified");
+				e.Connection.DisconnectAsync (ConnectionResult.Custom, "Identity not found or verified");
 				return;
 			}
 
@@ -210,10 +210,10 @@ namespace Tempest.Social
 				IEnumerable<Person> watched = await this.provider.GetWatchedAsync (identity);
 
 				if (watched == null || !watched.Any())
-					e.Connection.Send (new RequestBuddyListMessage());
+					e.Connection.SendAsync (new RequestBuddyListMessage());
 				else
 				{
-					e.Connection.Send (new BuddyListMessage
+					e.Connection.SendAsync (new BuddyListMessage
 					{
 						ChangeAction = NotifyCollectionChangedAction.Reset,
 						People = watched
@@ -230,7 +230,7 @@ namespace Tempest.Social
 						continue;
 				}
 
-				connection.Send (new PersonMessage { Person = e.Message.Person });
+				connection.SendAsync (new PersonMessage { Person = e.Message.Person });
 			}
 		}
 	}

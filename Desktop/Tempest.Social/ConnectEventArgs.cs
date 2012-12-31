@@ -24,17 +24,17 @@ namespace Tempest.Social
 	public class ConnectEventArgs
 		: PersonEventArgs
 	{
-		public ConnectEventArgs (Person person, EndPoint endPoint, bool youreHosting)
+		public ConnectEventArgs (Person person, Target target, bool youreHosting)
 			: base (person)
 		{
-			if (endPoint == null)
-				throw new ArgumentNullException ("endPoint");
+			if (target == null)
+				throw new ArgumentNullException ("target");
 
-			EndPoint = endPoint;
+			Target = target;
 			YoureHosting = youreHosting;
 		}
 
-		public EndPoint EndPoint
+		public Target Target
 		{
 			get;
 			private set;

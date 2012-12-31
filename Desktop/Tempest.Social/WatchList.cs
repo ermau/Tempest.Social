@@ -169,7 +169,7 @@ namespace Tempest.Social
 			var msg = new BuddyListMessage();
 			msg.People = people;
 			msg.ChangeAction = action;
-			this.clientContext.Connection.Send (msg);
+			this.clientContext.Connection.SendAsync (msg);
 		}
 
 		private void OnBuddyListMessage (MessageEventArgs<BuddyListMessage> e)

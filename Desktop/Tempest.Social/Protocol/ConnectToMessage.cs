@@ -37,17 +37,17 @@ namespace Tempest.Social
 		{
 		}
 
-		public ConnectToMessage (string id, bool youreHosting, EndPoint endPoint)
+		public ConnectToMessage (string id, bool youreHosting, Target target)
 			: this()
 		{
 			if (id == null)
 				throw new ArgumentNullException ("id");
-			if (endPoint == null)
-				throw new ArgumentNullException ("endPoint");
+			if (target == null)
+				throw new ArgumentNullException ("target");
 
 			Id = id;
 			YoureHosting = youreHosting;
-			EndPoint = endPoint;
+			Target = target;
 		}
 
 		/// <summary>
@@ -69,9 +69,9 @@ namespace Tempest.Social
 		}
 
 		/// <summary>
-		/// Gets or sets the end point to connect to or receive a connection from.
+		/// Gets or sets the target to connect to or receive a connection from.
 		/// </summary>
-		public EndPoint EndPoint
+		public Target Target
 		{
 			get;
 			set;
@@ -81,14 +81,15 @@ namespace Tempest.Social
 		{
 			writer.WriteString (Id);
 			writer.WriteBool (YoureHosting);
-			writer.Write (context, EndPoint);
+			writer.WriteString (Target.Hostname);
+			writer.WriteInt32 (Target.Port);
 		}
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
 			Id = reader.ReadString();
 			YoureHosting = reader.ReadBool();
-			EndPoint = reader.Read<EndPoint> (context);
+			Target = new Target (reader.ReadString(), reader.ReadInt32());
 		}
 	}
 }

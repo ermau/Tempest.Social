@@ -61,16 +61,16 @@ namespace Tempest.Social.Tests
 		{
 			const string id = "name";
 
-			IPEndPoint endPoint = new IPEndPoint (IPAddress.Loopback, 42);
+			Target target = new Target (Target.LoopbackIP, 42);
 			var msg = new ConnectToMessage
 			{
 				Id = id,
 				YoureHosting = true,
-				EndPoint = endPoint
+				Target = target
 			};
 
 			msg = msg.AssertLengthMatches();
-			Assert.AreEqual (endPoint, msg.EndPoint);
+			Assert.AreEqual (target, msg.Target);
 			Assert.AreEqual (id, msg.Id);
 			Assert.AreEqual (true, msg.YoureHosting);
 		}
@@ -78,14 +78,14 @@ namespace Tempest.Social.Tests
 		[Test]
 		public void ConnectToMessage_Ctor()
 		{
-			Assert.Throws<ArgumentNullException> (() => new ConnectToMessage (null, true, new IPEndPoint (IPAddress.Any, 100)));
+			Assert.Throws<ArgumentNullException> (() => new ConnectToMessage (null, true, new Target (Target.AnyIP, 100)));
 			Assert.Throws<ArgumentNullException> (() => new ConnectToMessage ("id", true, null));
 
-			IPEndPoint endPoint = new IPEndPoint (IPAddress.Loopback, 42);
-			var msg = new ConnectToMessage  ("id", true, endPoint);
+			Target target = new Target (Target.LoopbackIP, 42);
+			var msg = new ConnectToMessage  ("id", true, target);
 			Assert.AreEqual ("id", msg.Id);
 			Assert.AreEqual (true, msg.YoureHosting);
-			Assert.AreEqual (endPoint, msg.EndPoint);
+			Assert.AreEqual (target, msg.Target);
 		}
 
 		[Test]

@@ -113,12 +113,12 @@ namespace Tempest.Social
 
 		private void OnPersonaPropertyChanged (object sender, PropertyChangedEventArgs e)
 		{
-			Connection.Send (new PersonMessage (this.persona));
+			Connection.SendAsync (new PersonMessage (this.persona));
 		}
 
 		protected override void OnConnected (ClientConnectionEventArgs e)
 		{
-			Connection.Send (new PersonMessage { Person = Persona });
+			Connection.SendAsync (new PersonMessage { Person = Persona });
 
 			base.OnConnected (e);
 		}
@@ -137,7 +137,7 @@ namespace Tempest.Social
 				var args = new RequestConnectEventArgs (p);
 				OnConnectionRequest (args);
 
-				Connection.SendResponse (msg,
+				Connection.SendResponseAsync (msg,
 					new ConnectResultMessage ((args.Accept) ? ConnectResult.Success : ConnectResult.FailedRejected));
 			}, e.Message);
 		}
@@ -157,7 +157,7 @@ namespace Tempest.Social
 				if (!WatchList.TryGetPerson (e.Message.Id, out person))
 					return;
 
-				OnStartingConnection (new ConnectEventArgs (person, msg.EndPoint, msg.YoureHosting));
+				OnStartingConnection (new ConnectEventArgs (person, msg.Target, msg.YoureHosting));
 			}, e.Message);
 		}
 
