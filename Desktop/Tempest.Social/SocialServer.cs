@@ -180,6 +180,33 @@ namespace Tempest.Social
 			}
 		}
 
+		protected override async void OnConnectionDisconnected (object sender, DisconnectedEventArgs e)
+		{
+			string identity = await this.identityProvider.GetIdentityAsync (e.Connection);
+			if (identity != null)
+			{
+				Person person;
+				lock (this.sync)
+					this.people.TryGetValue (identity, out person);
+
+				if (person != null)
+				{
+					var watchers = await this.provider.GetWatchersAsync (person.Identity).ConfigureAwait (false);
+					foreach (var watcher in watchers)
+					{
+						IConnection connection;
+						lock (this.sync)
+							this.connections.TryGetValue (watcher.Identity, out connection);
+
+						if (connection != null)
+							connection.SendAsync (new PersonMessage (person));
+					}
+				}
+			}
+
+			base.OnConnectionDisconnected (sender, e);
+		}
+
 		private async void OnPersonMessage (MessageEventArgs<PersonMessage> e)
 		{
 			string identity = await this.identityProvider.GetIdentityAsync (e.Connection);
