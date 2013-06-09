@@ -4,7 +4,7 @@
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2012 Eric Maupin
+// Copyright (c) 2012-2013 Eric Maupin
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ namespace Tempest.Social
 	}
 
 	public sealed class Person
-		: ISerializable, INotifyPropertyChanged
+		: ISerializable, INotifyPropertyChanged, IEquatable<Person>
 	{
 		public Person (string identity)
 		{
@@ -102,6 +102,44 @@ namespace Tempest.Social
 			Identity = reader.ReadString();
 			Nickname = reader.ReadString();
 			Status = (Status)reader.ReadByte();
+		}
+
+		public override bool Equals (object obj)
+		{
+			if (ReferenceEquals (null, obj))
+				return false;
+			if (ReferenceEquals (this, obj))
+				return true;
+			return obj is Person && Equals ((Person)obj);
+		}
+
+		public bool Equals (Person other)
+		{
+			if (ReferenceEquals (null, other))
+				return false;
+			if (ReferenceEquals (this, other))
+				return true;
+			return string.Equals (this.nickname, other.nickname) && this.status == other.status && string.Equals (this.Identity, other.Identity);
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked {
+				int hashCode = (this.nickname != null ? this.nickname.GetHashCode() : 0);
+				hashCode = (hashCode * 397) ^ (int)this.status;
+				hashCode = (hashCode * 397) ^ (this.Identity != null ? this.Identity.GetHashCode() : 0);
+				return hashCode;
+			}
+		}
+
+		public static bool operator == (Person left, Person right)
+		{
+			return Equals (left, right);
+		}
+
+		public static bool operator != (Person left, Person right)
+		{
+			return !Equals (left, right);
 		}
 
 		private string nickname;
