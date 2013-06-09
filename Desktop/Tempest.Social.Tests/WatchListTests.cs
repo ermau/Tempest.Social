@@ -47,7 +47,7 @@ namespace Tempest.Social.Tests
 		private MockServerConnection serverConn;
 
 		[SetUp]
-		public async Task Setup()
+		public void Setup()
 		{
 			var provider = new MockConnectionProvider (SocialProtocol.Instance);
 			provider.Start (MessageTypes.Reliable);
@@ -57,7 +57,7 @@ namespace Tempest.Social.Tests
 			serverConn = cs.Item2;
 
 			var context = new TempestClient (clientConn, MessageTypes.Reliable);
-			await context.ConnectAsync (new Target (Target.LoopbackIP, 1));
+			context.ConnectAsync (new Target (Target.LoopbackIP, 1)).Wait();
 
 			list = new WatchList (context);
 		}
