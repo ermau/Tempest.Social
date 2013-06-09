@@ -145,9 +145,11 @@ namespace Tempest.Social
 			lock (this.people)
 			{
 				Person person;
-				TryGetPerson (e.Message.Person.Identity, out person);
-				person.Nickname = e.Message.Person.Nickname;
-				person.Status = e.Message.Person.Status;
+				if (TryGetPerson (e.Message.Person.Identity, out person)) {
+					person.Nickname = e.Message.Person.Nickname;
+					person.Status = e.Message.Person.Status;
+				} else
+					this.people.Add (e.Message.Person);
 			}
 		}
 
@@ -189,7 +191,7 @@ namespace Tempest.Social
 					lock (this.people)
 					{
 						foreach (Person person in e.Message.People)
-							Add (person);
+							this.people.Add (person);
 					}
 
 					break;
@@ -198,7 +200,7 @@ namespace Tempest.Social
 					lock (this.people)
 					{
 						foreach (Person person in e.Message.People)
-							Remove (person);
+							this.people.Remove (person);
 					}
 
 					break;
