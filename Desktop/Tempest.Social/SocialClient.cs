@@ -4,7 +4,7 @@
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2012 Eric Maupin
+// Copyright (c) 2012-2013 Eric Maupin
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,8 +45,7 @@ namespace Tempest.Social
 			this.persona.PropertyChanged += OnPersonaPropertyChanged;
 
 			this.RegisterMessageHandler<RequestBuddyListMessage> (OnRequestBuddyListMessage);
-			this.RegisterMessageHandler<ConnectRequestMessage> (OnConnectRequestMessage);
-			this.RegisterMessageHandler<ConnectToMessage> (OnConnectToMessage);
+			this.RegisterMessageHandler<GroupInviteMessage> (OnGroupInviteMessage);
 		}
 
 		/// <summary>
@@ -62,14 +61,9 @@ namespace Tempest.Social
 		public event EventHandler WatchListRequested;
 
 		/// <summary>
-		/// A connect request was received.
+		/// You have been invited to join a group.
 		/// </summary>
-		public event EventHandler<RequestConnectEventArgs> ConnectionRequest;
-
-		/// <summary>
-		/// Raised when a connection has been requested and accepted between you and another party.
-		/// </summary>
-		public event EventHandler<ConnectEventArgs> StartingConnection;
+		public event EventHandler<GroupInviteEventArgs> InvitedToGroup;
 
 		public Person Persona
 		{
@@ -79,18 +73,6 @@ namespace Tempest.Social
 		public WatchList WatchList
 		{
 			get { return this.watchList; }
-		}
-
-		public async Task<ConnectResult> ConnectToPersonAsync (string identity, Target localTarget)
-		{
-			if (identity == null)
-				throw new ArgumentNullException ("identity");
-			if (localTarget == null)
-				throw new ArgumentNullException ("localTarget");
-
-			var msg = new ConnectRequestMessage (identity, localTarget);
-			var response = await Connection.SendFor<ConnectResultMessage> (msg).ConfigureAwait (false);
-			return response.Result;
 		}
 
 		/// <summary>
@@ -126,23 +108,9 @@ namespace Tempest.Social
 			base.OnConnected (e);
 		}
 
-		private void OnConnectRequestMessage (MessageEventArgs<ConnectRequestMessage> e)
+		private void OnGroupInviteMessage (MessageEventArgs<GroupInviteMessage> e)
 		{
-			// Let's not block the network by waiting
-			Task.Factory.StartNew (s =>
-			{
-				ConnectRequestMessage msg = (ConnectRequestMessage)s;
-
-				Person p;
-				if (!this.watchList.TryGetPerson (msg.Identity, out p))
-					return;
-
-				var args = new RequestConnectEventArgs (p);
-				OnConnectionRequest (args);
-
-				ConnectResult result = (args.Accept) ? ConnectResult.Success : ConnectResult.FailedRejected;
-				Connection.SendResponseAsync (msg, new ConnectResultMessage (result, args.Target));
-			}, e.Message);
+			OnGroupInvite (e.Message.Group);
 		}
 
 		private void OnRequestBuddyListMessage (MessageEventArgs<RequestBuddyListMessage> e)
@@ -150,25 +118,11 @@ namespace Tempest.Social
 			Task.Factory.StartNew (OnBuddyListRequested);
 		}
 
-		private void OnConnectToMessage (MessageEventArgs<ConnectToMessage> e)
+		private void OnGroupInvite (Group group)
 		{
-			Task.Factory.StartNew (s =>
-			{
-				var msg = (ConnectToMessage)s;
-
-				Person person;
-				if (!WatchList.TryGetPerson (e.Message.Id, out person))
-					return;
-
-				OnStartingConnection (new ConnectEventArgs (person, msg.Target, msg.YoureHosting));
-			}, e.Message);
-		}
-
-		protected void OnStartingConnection (ConnectEventArgs e)
-		{
-			var handler = StartingConnection;
+			var handler = InvitedToGroup;
 			if (handler != null)
-				handler (this, e);
+				handler (this, new GroupInviteEventArgs (group));
 		}
 
 		private void OnBuddyListRequested ()
@@ -176,13 +130,6 @@ namespace Tempest.Social
 			var handler = this.WatchListRequested;
 			if (handler != null)
 				handler (this, EventArgs.Empty);
-		}
-
-		private void OnConnectionRequest (RequestConnectEventArgs e)
-		{
-			var handler = ConnectionRequest;
-			if (handler != null)
-				handler (this, e);
 		}
 	}
 }

@@ -1,10 +1,10 @@
 ﻿//
-// SocialMessage.cs
+// GroupUpdateMessage.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2012-2013 Eric Maupin
+// Copyright (c) 2013 Eric Maupin
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,60 +26,29 @@
 
 namespace Tempest.Social
 {
-	public enum SocialMessageType
-		: ushort
+	public class GroupUpdateMessage
+		: SocialMessage
 	{
-		/// <summary>
-		/// Sent from the server to client to indicate it does not have a buddy list for this person.
-		/// </summary>
-		RequestBuddyList = 1,
-		
-		/// <summary>
-		/// Sent from the server or client to update buddy lists.
-		/// </summary>
-		BuddyList = 2,
-		
-		/// <summary>
-		/// Updates a person's attributes, including your own.
-		/// </summary>
-		Person = 3,
-
-		/// <summary>
-		/// Request to be connected with another user.
-		/// </summary>
-		//ConnectRequest = 4,
-		//ConnectResult = 5,
-		//ConnectTo = 6,
-		
-		Search = 7,
-		SearchResult = 8,
-
-		CreateGroup = 9,
-		GroupResult = 10,
-		GroupInvite = 11,
-		LeaveGroup = 12,
-		GroupUpdate = 13,
-		
-		Text = 14,
-	}
-
-	public abstract class SocialMessage
-		: Message
-	{
-		protected SocialMessage (SocialMessageType type)
-			: base (SocialProtocol.Instance, (ushort)type)
+		public GroupUpdateMessage()
+			: base (SocialMessageType.GroupUpdate)
 		{
+			
 		}
-	}
 
-	public static class SocialProtocol
-	{
-		public static readonly Protocol Instance = new Protocol (2, 2);
-		public const int DefaultPort = 42920;
-
-		static SocialProtocol()
+		public Group Group
 		{
-			Instance.DiscoverFromAssemblyOf<SocialMessage>();
+			get;
+			set;
+		}
+
+		public override void WritePayload (ISerializationContext context, IValueWriter writer)
+		{
+			writer.Write (context, Group, GroupSerializer.Instance);
+		}
+
+		public override void ReadPayload (ISerializationContext context, IValueReader reader)
+		{
+			Group = reader.Read (context, GroupSerializer.Instance);
 		}
 	}
 }

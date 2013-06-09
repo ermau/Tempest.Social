@@ -1,10 +1,10 @@
 ﻿//
-// ConnectToMessage.cs
+// LeaveGroupMessage.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2012 Eric Maupin
+// Copyright (c) 2013 Eric Maupin
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,53 +24,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-
 namespace Tempest.Social
 {
-	public class ConnectToMessage
+	public class LeaveGroupMessage
 		: SocialMessage
 	{
-		public ConnectToMessage()
-			: base (SocialMessageType.ConnectTo)
+		public LeaveGroupMessage()
+			: base (SocialMessageType.LeaveGroup)
 		{
+			
 		}
 
-		public ConnectToMessage (string id, bool youreHosting, Target target)
-			: this()
-		{
-			if (id == null)
-				throw new ArgumentNullException ("id");
-			if (target == null)
-				throw new ArgumentNullException ("target");
-
-			Id = id;
-			YoureHosting = youreHosting;
-			Target = target;
-		}
-
-		/// <summary>
-		/// Gets or sets whether this connection client is to be the host.
-		/// </summary>
-		public bool YoureHosting
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// Gets or sets the ID of the person to connect to.
-		/// </summary>
-		public string Id
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// Gets or sets the target to connect to or receive a connection from.
-		/// </summary>
-		public Target Target
+		public int GroupId
 		{
 			get;
 			set;
@@ -78,17 +43,12 @@ namespace Tempest.Social
 
 		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
-			writer.WriteString (Id);
-			writer.WriteBool (YoureHosting);
-			writer.WriteString (Target.Hostname);
-			writer.WriteInt32 (Target.Port);
+			writer.WriteInt32 (GroupId);
 		}
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
-			Id = reader.ReadString();
-			YoureHosting = reader.ReadBool();
-			Target = new Target (reader.ReadString(), reader.ReadInt32());
+			GroupId = reader.ReadInt32();
 		}
 	}
 }

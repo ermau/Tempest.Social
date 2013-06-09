@@ -43,12 +43,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConnectEventArgs.cs" />
+    <Compile Include="Group.cs" />
+    <Compile Include="GroupInviteEventArgs.cs" />
     <Compile Include="PersonIdentityEqualityComparer.cs" />
-    <Compile Include="Protocol\ConnectRequestMessage.cs" />
-    <Compile Include="Protocol\ConnectResultMessage.cs" />
-    <Compile Include="Protocol\ConnectToMessage.cs" />
+    <Compile Include="Protocol\CreateGroupMessage.cs" />
+    <Compile Include="Protocol\GroupResultMessage.cs" />
+    <Compile Include="Protocol\GroupInviteMessage.cs" />
+    <Compile Include="Protocol\GroupUpdateMessage.cs" />
+    <Compile Include="Protocol\LeaveGroupMessage.cs" />
     <Compile Include="Protocol\SearchMessage.cs" />
     <Compile Include="Protocol\SearchResultMessage.cs" />
+    <Compile Include="Protocol\TextMessage.cs" />
     <Compile Include="WatchList.cs" />
     <Compile Include="IIdentityProvider.cs" />
     <Compile Include="IWatchListProvider.cs">

@@ -49,7 +49,6 @@ namespace Tempest.Social
 
 			this.RegisterMessageHandler<PersonMessage> (OnPersonMessage);
 			this.RegisterMessageHandler<BuddyListMessage> (OnBuddyListMessage);
-			this.RegisterMessageHandler<ConnectRequestMessage> (OnConnectRequestMessage);
 			this.RegisterMessageHandler<SearchMessage> (OnSearchMessage);
 		}
 
@@ -68,7 +67,7 @@ namespace Tempest.Social
 				found = this.connections.TryGetKey (connection, out identity);
 
 			if (!found)
-				identity = await this.identityProvider.GetIdentityAsync (connection);
+				identity = await this.identityProvider.GetIdentityAsync (connection).ConfigureAwait (false);
 
 			Person person;
 			lock (this.sync)
@@ -106,50 +105,6 @@ namespace Tempest.Social
 			}
 
 			e.Connection.SendResponseAsync (e.Message, new SearchResultMessage (results));
-		}
-
-		private async void OnConnectRequestMessage (MessageEventArgs<ConnectRequestMessage> e)
-		{
-			Person owner = await GetPerson (e.Connection);
-			if (owner == null)
-			{
-				e.Connection.DisconnectAsync (ConnectionResult.Custom, "Identity not found or verified");
-				return;
-			}
-
-			bool found;
-			Person target;
-			IConnection targetConnection = null;
-			lock (this.sync)
-			{
-				found = this.people.TryGetValue (e.Message.Identity, out target);
-				if (found)
-					targetConnection = this.connections[target.Identity];
-			}
-
-			if (!found)
-			{
-				e.Connection.SendResponseAsync (e.Message, new ConnectResultMessage (ConnectResult.FailedNotFound, null));
-				return;
-			}
-
-			var watchers = await provider.GetWatchedAsync (owner.Identity).ConfigureAwait (false);
-			if (!watchers.Any (p => p.Identity == target.Identity))
-			{
-				e.Connection.SendResponseAsync (e.Message, new ConnectResultMessage (ConnectResult.FailedNotFollowing, null));
-				return;
-			}
-
-			var request = new ConnectRequestMessage (e.Message.Identity, e.Message.Target);
-			var response = await targetConnection.SendFor<ConnectResultMessage> (request).ConfigureAwait (false);
-			
-			e.Connection.SendResponseAsync (e.Message, response);
-
-			if (response.Result == ConnectResult.Success)
-			{
-				e.Connection.SendAsync (new ConnectToMessage (target.Identity, true, targetConnection.RemoteTarget));
-				targetConnection.SendAsync (new ConnectToMessage (owner.Identity, false, e.Connection.RemoteTarget));
-			}
 		}
 
 		private async void OnBuddyListMessage (MessageEventArgs<BuddyListMessage> e)

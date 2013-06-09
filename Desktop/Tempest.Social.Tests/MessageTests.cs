@@ -4,7 +4,7 @@
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2012 Eric Maupin
+// Copyright (c) 2012-2013 Eric Maupin
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,65 +36,6 @@ namespace Tempest.Social.Tests
 	[TestFixture]
 	public class MessageTests
 	{
-		[Test]
-		public void ConnectRequestMessage()
-		{
-			const string identity = "identity";
-			Target target = new Target (Target.LoopbackIP, 42);
-			var msg = new ConnectRequestMessage (identity, target);
-
-			msg = msg.AssertLengthMatches();
-			Assert.AreEqual (identity, msg.Identity);
-			Assert.AreEqual (target, msg.Target);
-		}
-
-		[TestCase (ConnectResult.FailedNotFound, null, 0)]
-		[TestCase (ConnectResult.Success, Target.LoopbackIP, 42)]
-		public void ConnectResultMessage (ConnectResult result, string host, int port)
-		{
-			Target target = null;
-			if (host != null)
-				target = new Target (host, port);
-
-			var msg = new ConnectResultMessage (result, target);
-
-			msg = msg.AssertLengthMatches();
-			Assert.AreEqual (result, msg.Result);
-			Assert.AreEqual (target, msg.Target);
-		}
-
-		[Test]
-		public void ConnectToMessage()
-		{
-			const string id = "name";
-
-			Target target = new Target (Target.LoopbackIP, 42);
-			var msg = new ConnectToMessage
-			{
-				Id = id,
-				YoureHosting = true,
-				Target = target
-			};
-
-			msg = msg.AssertLengthMatches();
-			Assert.AreEqual (target, msg.Target);
-			Assert.AreEqual (id, msg.Id);
-			Assert.AreEqual (true, msg.YoureHosting);
-		}
-
-		[Test]
-		public void ConnectToMessage_Ctor()
-		{
-			Assert.Throws<ArgumentNullException> (() => new ConnectToMessage (null, true, new Target (Target.AnyIP, 100)));
-			Assert.Throws<ArgumentNullException> (() => new ConnectToMessage ("id", true, null));
-
-			Target target = new Target (Target.LoopbackIP, 42);
-			var msg = new ConnectToMessage  ("id", true, target);
-			Assert.AreEqual ("id", msg.Id);
-			Assert.AreEqual (true, msg.YoureHosting);
-			Assert.AreEqual (target, msg.Target);
-		}
-
 		[Test]
 		public void PersonMessage()
 		{

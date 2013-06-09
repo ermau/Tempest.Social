@@ -1,10 +1,10 @@
 ﻿//
-// PersonTests.cs
+// GroupInviteEventArgsTests.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2012-2013 Eric Maupin
+// Copyright (c) 2013 Eric Maupin
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,29 +25,28 @@
 // THE SOFTWARE.
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 
 namespace Tempest.Social.Tests
 {
 	[TestFixture]
-	public class PersonTests
+	public class GroupInviteEventArgsTests
 	{
 		[Test]
 		public void CtorInvalid()
 		{
-			Assert.Throws<ArgumentNullException> (() => new Person (null));
-			Assert.Throws<ArgumentException> (() => new Person (String.Empty));
-			Assert.Throws<ArgumentException> (() => new Person ("  "));
+			Assert.Throws<ArgumentNullException> (() => new GroupInviteEventArgs (null));
 		}
 
 		[Test]
 		public void Ctor()
 		{
-			const string id = "fooBar";
-			var person = new Person (id);
-
-			Assert.AreEqual (id, person.Identity);
-			Assert.AreEqual (Status.Offline, person.Status);
+			var group = new Group();
+			
+			var invite = new GroupInviteEventArgs (group);
+			Assert.AreSame (group, invite.Group);
+			Assert.IsFalse (invite.AcceptInvite);
 		}
 	}
 }

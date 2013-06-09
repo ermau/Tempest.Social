@@ -1,10 +1,10 @@
 ﻿//
-// ConnectRequestMessage.cs
+// GroupInviteEventArgs.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2012 Eric Maupin
+// Copyright (c) 2013 Eric Maupin
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,54 +25,31 @@
 // THE SOFTWARE.
 
 using System;
+using System.Linq;
 
 namespace Tempest.Social
 {
-	public class ConnectRequestMessage
-		: SocialMessage
+	public class GroupInviteEventArgs
+		: EventArgs
 	{
-		public ConnectRequestMessage()
-			: base (SocialMessageType.ConnectRequest)
+		public GroupInviteEventArgs (Group group)
 		{
+			if (group == null)
+				throw new ArgumentNullException ("group");
+			
+			Group = group;
 		}
 
-		public ConnectRequestMessage (string identity, Target target)
-			: this()
-		{
-			if (identity == null)
-				throw new ArgumentNullException ("identity");
-			if (target == null)
-				throw new ArgumentNullException ("target");
-
-			Identity = identity;
-			Target = target;
-		}
-
-		/// <summary>
-		/// Gets or sets the target for the other client to connect to.
-		/// </summary>
-		public Target Target
+		public Group Group
 		{
 			get;
 			private set;
 		}
 
-		public string Identity
+		public bool AcceptInvite
 		{
 			get;
-			private set;
-		}
-
-		public override void WritePayload (ISerializationContext context, IValueWriter writer)
-		{
-			writer.WriteString (Identity);
-			Target.Serialize (context, writer);
-		}
-
-		public override void ReadPayload (ISerializationContext context, IValueReader reader)
-		{
-			Identity = reader.ReadString();
-			Target = new Target (context, reader);
+			set;
 		}
 	}
 }
