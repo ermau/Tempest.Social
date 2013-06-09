@@ -32,7 +32,7 @@ using System.Threading.Tasks;
 namespace Tempest.Social
 {
 	public class SocialClient
-		: LocalClient
+		: TempestClient
 	{
 		public SocialClient (IClientConnection connection, Person persona)
 			: base (connection, MessageTypes.Reliable)

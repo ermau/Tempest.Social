@@ -29,7 +29,6 @@ namespace Tempest.Social.Server
 			var provider = new UdpConnectionProvider (
 				SocialProtocol.DefaultPort,
 				SocialProtocol.Instance,
-				() => new RSACrypto(),
 				key);
 
 			SocialServer server = new SocialServer (new MemoryWatchListProvider(), IdentityProvider);

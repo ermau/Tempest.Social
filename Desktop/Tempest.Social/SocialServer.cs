@@ -34,7 +34,7 @@ using Cadenza.Collections;
 namespace Tempest.Social
 {
 	public class SocialServer
-		: Server
+		: TempestServer
 	{
 		public SocialServer (IWatchListProvider provider, IIdentityProvider identityProvider)
 			: base (MessageTypes.Reliable)
