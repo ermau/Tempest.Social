@@ -42,7 +42,7 @@ namespace Tempest.Social.Tests
 		[Test]
 		public void Ctor()
 		{
-			var group = new Group();
+			var group = new Group (1);
 			
 			var invite = new GroupInviteEventArgs (group);
 			Assert.AreSame (group, invite.Group);

@@ -6,10 +6,25 @@ namespace Tempest.Social
 {
 	public class Group
 	{
+		public Group (int id)
+		{
+			Id = id;
+		}
+
+		public Group (int id, IEnumerable<string> participants)
+			: this (id)
+		{
+			if (participants == null)
+				throw new ArgumentNullException ("participants");
+
+			foreach (string participant in participants)
+				this.participants.Add (participant);
+		}
+
 		public int Id
 		{
 			get;
-			internal set;
+			private set;
 		}
 
 		public IEnumerable<string> Participants
@@ -33,12 +48,7 @@ namespace Tempest.Social
 
 		public Group Deserialize (ISerializationContext context, IValueReader reader)
 		{
-			Group group = new Group();
-			group.Id = reader.ReadInt32();
-			foreach (string p in reader.ReadEnumerable (context, Serializer<string>.Default))
-				group.participants.Add (p);
-
-			return group;
+			return new Group (reader.ReadInt32(), reader.ReadEnumerable (context, Serializer<string>.Default));
 		}
 	}
 }
