@@ -4,7 +4,7 @@
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2012 Eric Maupin
+// Copyright (c) 2012-2013 Eric Maupin
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,7 @@ namespace Tempest.Social
 			this.RegisterMessageHandler<PersonMessage> (OnPersonMessage);
 			this.RegisterMessageHandler<BuddyListMessage> (OnBuddyListMessage);
 			this.RegisterMessageHandler<SearchMessage> (OnSearchMessage);
+			this.RegisterMessageHandler<InviteToGroupMessage> (OnInviteToGroupMessage);
 		}
 
 		private readonly IWatchListProvider provider;
@@ -80,6 +81,36 @@ namespace Tempest.Social
 				return null;
 
 			return person;
+		}
+
+		private async void OnInviteToGroupMessage (MessageEventArgs<InviteToGroupMessage> e)
+		{
+			Person inviter = await GetPerson (e.Connection);
+
+			if (inviter == null || !await this.provider.GetIsWatcherAsync (inviter.Identity, e.Message.Invitee)) {
+				e.Connection.SendResponseAsync (e.Message, new GroupInviteResponse {
+					GroupId = e.Message.GroupId,
+					Response = InvitationResponse.Error
+				});
+				return;
+			}
+
+			bool online;
+			Person invitee;
+			IConnection connection;
+			lock (this.sync) {
+				online = (!this.people.TryGetValue (e.Message.Invitee, out invitee)
+				          || invitee.Status == Status.Offline
+				          || !this.connections.TryGetValue (e.Message.Invitee, out connection));
+			}
+
+			if (!online) {
+				e.Connection.SendResponseAsync (e.Message, new GroupInviteResponse {
+					GroupId = e.Message.GroupId,
+					Response = InvitationResponse.Offline
+				});
+			} else {
+			}
 		}
 
 		private void OnSearchMessage (MessageEventArgs<SearchMessage> e)

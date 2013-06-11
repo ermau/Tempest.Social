@@ -1,5 +1,5 @@
 ﻿//
-// InviteToGroupMessage.cs
+// GroupInviteMessage.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -24,14 +24,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+
+using System;
+using System.Linq;
+
 namespace Tempest.Social
 {
+	/// <summary>
+	/// Represents a received message inviting you to a group.
+	/// </summary>
 	public class GroupInviteMessage
 		: SocialMessage
 	{
 		public GroupInviteMessage()
 			: base (SocialMessageType.GroupInvite)
 		{
+		}
+
+		public string Inviter
+		{
+			get;
+			set;
 		}
 
 		public Group Group
@@ -42,11 +55,13 @@ namespace Tempest.Social
 
 		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
+			writer.WriteString (Inviter);
 			writer.Write (context, Group, GroupSerializer.Instance);
 		}
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
+			Inviter = reader.ReadString();
 			Group = reader.Read (context, GroupSerializer.Instance);
 		}
 	}

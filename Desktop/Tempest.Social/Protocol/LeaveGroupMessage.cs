@@ -26,7 +26,7 @@
 
 namespace Tempest.Social
 {
-	public class LeaveGroupMessage
+	public sealed class LeaveGroupMessage
 		: SocialMessage
 	{
 		public LeaveGroupMessage()

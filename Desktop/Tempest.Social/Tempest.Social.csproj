@@ -49,9 +49,10 @@
     <Compile Include="Invitation.cs" />
     <Compile Include="PersonIdentityEqualityComparer.cs" />
     <Compile Include="Protocol\CreateGroupMessage.cs" />
-    <Compile Include="Protocol\GroupResultMessage.cs" />
-    <Compile Include="Protocol\GroupInviteMessage.cs" />
+    <Compile Include="Protocol\GroupInviteResponse.cs" />
+    <Compile Include="Protocol\InviteToGroupMessage.cs" />
     <Compile Include="Protocol\GroupUpdateMessage.cs" />
+    <Compile Include="Protocol\GroupInviteMessage.cs" />
     <Compile Include="Protocol\LeaveGroupMessage.cs" />
     <Compile Include="Protocol\SearchMessage.cs" />
     <Compile Include="Protocol\SearchResultMessage.cs" />

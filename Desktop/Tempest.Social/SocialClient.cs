@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Tempest.Social
@@ -65,14 +66,46 @@ namespace Tempest.Social
 		/// </summary>
 		public event EventHandler<GroupInviteEventArgs> InvitedToGroup;
 
+		/// <summary>
+		/// Gets your <see cref="Person"/>.
+		/// </summary>
 		public Person Persona
 		{
 			get { return this.persona; }
 		}
 
+		/// <summary>
+		/// Gets your <see cref="WatchList"/>.
+		/// </summary>
 		public WatchList WatchList
 		{
 			get { return this.watchList; }
+		}
+
+		/// <summary>
+		/// Asynchronously creates a group.
+		/// </summary>
+		/// <returns>The created group.</returns>
+		public async Task<Group> CreateGroupAsync()
+		{
+			var response = await Connection.SendFor<GroupUpdateMessage> (new CreateGroupMessage()).ConfigureAwait (false);
+			return response.Group;
+		}
+
+		public async Task<Invitation> InviteToGroupAsync (Group group, Person person)
+		{
+			if (group == null)
+				throw new ArgumentNullException ("group");
+			if (person == null)
+				throw new ArgumentNullException ("person");
+
+			var response = await Connection.SendFor<GroupInviteResponse> (
+				new InviteToGroupMessage {
+					Invitee = person.Identity,
+					GroupId = group.Id
+				}).ConfigureAwait (false);
+
+			return new Invitation (group, person, response.Response);
 		}
 
 		/// <summary>
@@ -110,7 +143,13 @@ namespace Tempest.Social
 
 		private void OnGroupInviteMessage (MessageEventArgs<GroupInviteMessage> e)
 		{
-			OnGroupInvite (e.Message.Group);
+			var args = new GroupInviteEventArgs (e.Message.Group);
+			OnGroupInvite (args);
+
+			Connection.SendAsync (new GroupInviteResponse {
+				GroupId = e.Message.Group.Id,
+				Response = (args.AcceptInvite) ? InvitationResponse.Accepted : InvitationResponse.Rejected
+			});
 		}
 
 		private void OnRequestBuddyListMessage (MessageEventArgs<RequestBuddyListMessage> e)
@@ -118,11 +157,11 @@ namespace Tempest.Social
 			Task.Factory.StartNew (OnBuddyListRequested);
 		}
 
-		private void OnGroupInvite (Group group)
+		private void OnGroupInvite (GroupInviteEventArgs args)
 		{
 			var handler = InvitedToGroup;
 			if (handler != null)
-				handler (this, new GroupInviteEventArgs (group));
+				handler (this, args);
 		}
 
 		private void OnBuddyListRequested ()

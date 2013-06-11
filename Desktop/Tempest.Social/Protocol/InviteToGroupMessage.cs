@@ -1,5 +1,5 @@
 ﻿//
-// CreateGroupMessage.cs
+// InviteToGroupMessage.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -26,20 +26,42 @@
 
 namespace Tempest.Social
 {
-	public sealed class CreateGroupMessage
+	public sealed class InviteToGroupMessage
 		: SocialMessage
 	{
-		public CreateGroupMessage()
-			: base (SocialMessageType.CreateGroup)
+		public InviteToGroupMessage()
+			: base (SocialMessageType.InviteToGroup)
 		{
+		}
+
+		/// <summary>
+		/// Gets or sets the identity of the person being invited.
+		/// </summary>
+		public string Invitee
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Gets or sets the id of the group the <see cref="Invitee"/> is being invited to.
+		/// </summary>
+		public int GroupId
+		{
+			get;
+			set;
 		}
 
 		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
+			writer.WriteInt32 (GroupId);
+			writer.WriteString (Invitee);
 		}
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
+			GroupId = reader.ReadInt32();
+			Invitee = reader.ReadString();
 		}
 	}
 }

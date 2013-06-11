@@ -26,7 +26,13 @@
 
 namespace Tempest.Social
 {
-	public class GroupUpdateMessage
+	/// <summary>
+	/// Represents a group update.
+	/// </summary>
+	/// <remarks>
+	/// Also used as the response to a <seealso cref="CreateGroupMessage"/>.
+	/// </remarks>
+	public sealed class GroupUpdateMessage
 		: SocialMessage
 	{
 		public GroupUpdateMessage()

@@ -51,16 +51,50 @@ namespace Tempest.Social
 		//ConnectResult = 5,
 		//ConnectTo = 6,
 		
+		/// <summary>
+		/// Search for a person
+		/// </summary>
 		Search = 7,
+
+		/// <summary>
+		/// Search results
+		/// </summary>
 		SearchResult = 8,
 
+		/// <summary>
+		/// Create a group
+		/// </summary>
 		CreateGroup = 9,
-		GroupResult = 10,
-		GroupInvite = 11,
-		LeaveGroup = 12,
-		GroupUpdate = 13,
+
+		/// <summary>
+		/// Invite people to a group
+		/// </summary>
+		InviteToGroup = 10,
 		
-		Text = 14,
+		/// <summary>
+		/// A received invitation to a group
+		/// </summary>
+		GroupInvite = 11,
+
+		/// <summary>
+		/// A response to a received group invitation
+		/// </summary>
+		GroupInviteResponse = 12,
+		
+		/// <summary>
+		/// Leave a group
+		/// </summary>
+		LeaveGroup = 13,
+
+		/// <summary>
+		/// The group was updated
+		/// </summary>
+		GroupUpdate = 14,
+		
+		/// <summary>
+		/// Text message
+		/// </summary>
+		Text = 15,
 	}
 
 	public abstract class SocialMessage

@@ -1,5 +1,5 @@
 ﻿//
-// CreateGroupMessage.cs
+// GroupInviteResponse.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -24,22 +24,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace Tempest.Social
 {
-	public sealed class CreateGroupMessage
+	/// <summary>
+	/// Represents a response to a group invite.
+	/// </summary>
+	/// <seealso cref="GroupInviteMessage"/>
+	public sealed class GroupInviteResponse
 		: SocialMessage
 	{
-		public CreateGroupMessage()
-			: base (SocialMessageType.CreateGroup)
+		public GroupInviteResponse()
+			: base (SocialMessageType.GroupInviteResponse)
 		{
+			
+		}
+
+		public int GroupId
+		{
+			get;
+			set;
+		}
+
+		public InvitationResponse Response
+		{
+			get;
+			set;
 		}
 
 		public override void WritePayload (ISerializationContext context, IValueWriter writer)
 		{
+			writer.WriteInt32 (GroupId);
+			writer.WriteByte ((byte)Response);
 		}
 
 		public override void ReadPayload (ISerializationContext context, IValueReader reader)
 		{
+			GroupId = reader.ReadInt32();
+			Response = (InvitationResponse)reader.ReadByte();
 		}
 	}
 }
