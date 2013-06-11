@@ -97,6 +97,20 @@ namespace Tempest.Social
 			return Task.FromResult (true);
 		}
 
+		public Task<bool> GetIsWatcherAsync (string watcher, string watchee)
+		{
+			if (watcher == null)
+				throw new ArgumentNullException ("watcher");
+			if (watchee == null)
+				throw new ArgumentNullException ("watchee");
+
+			bool isWatcher;
+			lock (this.watchLists)
+				isWatcher = this.watchLists[watchee].Contains (watchee);
+
+			return Task.FromResult (isWatcher);
+		}
+
 		public Task<IEnumerable<Person>> GetWatchedAsync (string listOwner)
 		{
 			if (listOwner == null)

@@ -64,6 +64,14 @@ namespace Tempest.Social
 		Task ClearAsync (string listOwner);
 
 		/// <summary>
+		/// Asynchronously retrieves whether the <paramref name="watcher"/> is a watcher of <paramref name="watchee"/>.
+		/// </summary>
+		/// <param name="watcher">The user to check the watch list of.</param>
+		/// <param name="watchee">The user to check the watch list for.</param>
+		/// <returns><c>true</c> if <paramref name="watcher"/> is watching <paramref name="watchee"/>.</returns>
+		Task<bool> GetIsWatcherAsync (string watcher, string watchee);
+
+		/// <summary>
 		/// Asynchronously retrieves the identifiers watched by <paramref name="listOwner"/>'s.
 		/// </summary>
 		/// <param name="listOwner">The <see cref="Person.Identity"/> of the person to retrieve the list for.</param>
