@@ -64,6 +64,9 @@ namespace Tempest.Social
 
 		public void Add (Person item)
 		{
+			if (item == null)
+				throw new ArgumentNullException ("item");
+
 			lock (this.people)
 				this.people.Add (item);
 
@@ -80,29 +83,44 @@ namespace Tempest.Social
 
 		public bool Contains (Person item)
 		{
+			if (item == null)
+				throw new ArgumentNullException ("item");
+
 			lock (this.people)
 				return this.people.Contains (item);
 		}
 
 		public void CopyTo (Person[] array, int arrayIndex)
 		{
+			if (array == null)
+				throw new ArgumentNullException ("array");
+			if (arrayIndex >= array.Length)
+				throw new ArgumentOutOfRangeException ("arrayIndex");
+
 			lock (this.people)
 				this.people.CopyTo (array, arrayIndex);
 		}
 
 		public bool Remove (Person item)
 		{
+			if (item == null)
+				throw new ArgumentNullException ("item");
+
 			bool removed;
 			lock (this.people)
 				removed = this.people.Remove (item);
 
-			Send (NotifyCollectionChangedAction.Remove, item);
+			if (removed)
+				Send (NotifyCollectionChangedAction.Remove, item);
 
 			return removed;
 		}
 
 		public bool TryGetPerson (string identity, out Person person)
 		{
+			if (identity == null)
+				throw new ArgumentNullException ("identity");
+
 			lock (this.people)
 			{
 				person = this.people.FirstOrDefault (p => p.Identity == identity);
@@ -145,11 +163,11 @@ namespace Tempest.Social
 			lock (this.people)
 			{
 				Person person;
-				if (TryGetPerson (e.Message.Person.Identity, out person)) {
-					person.Nickname = e.Message.Person.Nickname;
-					person.Status = e.Message.Person.Status;
-				} else
-					this.people.Add (e.Message.Person);
+				if (!TryGetPerson (e.Message.Person.Identity, out person))
+					return;
+
+				person.Nickname = e.Message.Person.Nickname;
+				person.Status = e.Message.Person.Status;
 			}
 		}
 
