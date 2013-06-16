@@ -27,12 +27,12 @@ namespace Tempest.Social
 			private set;
 		}
 
-		public IEnumerable<string> Participants
+		public ICollection<string> Participants
 		{
 			get { return this.participants; }
 		}
 
-		internal readonly ObservableCollection<string> participants = new ObservableCollection<string>();
+		private readonly ObservableCollection<string> participants = new ObservableCollection<string>();
 	}
 
 	public class GroupSerializer
