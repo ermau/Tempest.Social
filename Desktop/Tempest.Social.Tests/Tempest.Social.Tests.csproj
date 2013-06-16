@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="GroupInviteEventArgsTests.cs" />
     <Compile Include="GroupManagerTests.cs" />
+    <Compile Include="GroupTests.cs" />
     <Compile Include="InvitationTests.cs" />
     <Compile Include="PersonIdentityEqualityComparerTests.cs" />
     <Compile Include="WatchListProviderTests.cs" />
