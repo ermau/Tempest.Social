@@ -83,6 +83,11 @@ namespace Tempest.Social
 				this.groups.Remove (group.Id);
 		}
 
+		public bool TryGetGroup (int groupId, out Group group)
+		{
+			return this.groups.TryGetValue (groupId, out group);
+		}
+
 		private int nextId;
 		private readonly Dictionary<int, Group> groups = new Dictionary<int, Group>();
 

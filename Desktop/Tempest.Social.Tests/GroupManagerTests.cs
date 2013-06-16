@@ -155,5 +155,23 @@ namespace Tempest.Social.Tests
 			CollectionAssert.DoesNotContain (group.Participants, p2.Identity);
 			Assert.IsTrue (updated, "GroupUpdated did not fire");
 		}
+
+		[Test]
+		public void TryGetGroupNotPresent()
+		{
+			Group group;
+			Assert.IsFalse (gm.TryGetGroup (5, out group));
+			Assert.IsNull (group);
+		}
+
+		[Test]
+		public void TryGetGroup()
+		{
+			group = gm.CreateGroup (person);
+
+			Group g;
+			Assert.IsTrue (gm.TryGetGroup (group.Id, out g));
+			Assert.AreSame (group, g);
+		}
 	}
 }
