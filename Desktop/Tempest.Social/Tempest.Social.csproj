@@ -49,6 +49,7 @@
     <Compile Include="Invitation.cs" />
     <Compile Include="PersonIdentityEqualityComparer.cs" />
     <Compile Include="Protocol\CreateGroupMessage.cs" />
+    <Compile Include="Protocol\GroupConnectionMessage.cs" />
     <Compile Include="Protocol\GroupInviteResponse.cs" />
     <Compile Include="Protocol\InviteToGroupMessage.cs" />
     <Compile Include="Protocol\GroupUpdateMessage.cs" />

@@ -92,9 +92,15 @@ namespace Tempest.Social
 		GroupUpdate = 14,
 		
 		/// <summary>
+		/// 
+		/// </summary>
+		GroupConnection = 15,
+
+		/// <summary>
 		/// Text message
 		/// </summary>
-		Text = 15,
+		Text = 16,
+		
 	}
 
 	public abstract class SocialMessage
