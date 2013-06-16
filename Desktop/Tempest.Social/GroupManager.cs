@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Tempest.Social
@@ -42,7 +43,7 @@ namespace Tempest.Social
 				throw new ArgumentNullException ("person");
 
 			while (this.groups.ContainsKey (this.nextId))
-				this.nextId++;
+				Interlocked.Increment (ref this.nextId);
 
 			var group = new Group (this.nextId, new[] { person.Identity });
 			this.groups.Add (group.Id, group);
