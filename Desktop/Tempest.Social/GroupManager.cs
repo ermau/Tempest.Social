@@ -50,12 +50,32 @@ namespace Tempest.Social
 			return group;
 		}
 
-		public void LeaveGroup (Person person, Group group)
+		public void JoinGroup (Group group, Person person)
+		{
+			if (group == null)
+				throw new ArgumentNullException ("group");
+			if (person == null)
+				throw new ArgumentNullException ("person");
+
+			if (!this.groups.TryGetValue (group.Id, out group))
+				return;
+
+			group.Participants.Add (person.Identity);
+			OnGroupUpdated (group);
+		}
+
+		public void LeaveGroup (Group group, Person person)
 		{
 			if (person == null)
 				throw new ArgumentNullException ("person");
 			if (group == null)
 				throw new ArgumentNullException ("group");
+
+			if (!this.groups.TryGetValue (group.Id, out group))
+				return;
+
+			if (group.Participants.Remove (person.Identity))
+				OnGroupUpdated (group);
 		}
 
 		private int nextId;

@@ -25,11 +25,7 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace Tempest.Social.Tests
@@ -37,10 +33,21 @@ namespace Tempest.Social.Tests
 	[TestFixture]
 	public class GroupManagerTests
 	{
+		private Person person;
+		private Group group;
+		private GroupManager gm;
+
+		[SetUp]
+		public void Setup()
+		{
+			gm = new GroupManager();
+			person = new Person ("Id");
+			group = new Group (1);
+		}
+
 		[Test]
 		public void CreateGroupInvalid()
 		{
-			var gm = new GroupManager();
 			var ane = Assert.Throws<ArgumentNullException> (() => gm.CreateGroup (null),
 				"Allowed null person");
 			Assert.AreEqual ("person", ane.ParamName);
@@ -49,26 +56,104 @@ namespace Tempest.Social.Tests
 		[Test]
 		public void CreateGroup()
 		{
-			var person = new Person ("id");
+			var g = gm.CreateGroup (person);
 
-			var vm = new GroupManager();
-			var group = vm.CreateGroup (person);
+			Assert.IsNotNull (g);
+			CollectionAssert.Contains (g.Participants, person.Identity);
+		}
 
-			Assert.IsNotNull (group);
+		[Test]
+		public void JoinGroupInvalid()
+		{
+			var ane = Assert.Throws<ArgumentNullException> (() => gm.JoinGroup (null, person),
+				"Allowed null group");
+			Assert.AreEqual ("group", ane.ParamName);
+
+			ane = Assert.Throws<ArgumentNullException> (() => gm.JoinGroup (group, null),
+				"Allowed null person");
+			Assert.AreEqual ("person", ane.ParamName);
+		}
+
+		[Test]
+		public void JoinGroupUnknown()
+		{
+			Assert.DoesNotThrow (() => gm.JoinGroup (group, person));
+			CollectionAssert.IsEmpty (group.Participants);
+		}
+
+		[Test]
+		public void JoinGroup()
+		{
+			group = gm.CreateGroup (person);
+			var p2 = new Person ("2");
+
+			bool joined = false;
+			gm.GroupUpdated += g => {
+				Assert.AreSame (group, g);
+				joined = true;
+			};
+
+			gm.JoinGroup (group, p2);
+
 			CollectionAssert.Contains (group.Participants, person.Identity);
+
+			Assert.IsTrue (joined, "GroupUpdated did not fire");
 		}
 
 		[Test]
 		public void LeaveGroupInvalid()
 		{
-			var gm = new GroupManager();
-			var ane = Assert.Throws<ArgumentNullException> (() => gm.LeaveGroup (null, new Group (1)),
+			var ane = Assert.Throws<ArgumentNullException> (() => gm.LeaveGroup (new Group (1), null),
 				"Allowed null person");
 			Assert.AreEqual ("person", ane.ParamName);
 
-			ane = Assert.Throws<ArgumentNullException> (() => gm.LeaveGroup (new Person ("id"), null),
+			ane = Assert.Throws<ArgumentNullException> (() => gm.LeaveGroup (null, new Person ("id")),
 				"Allowed null group");
 			Assert.AreEqual ("group", ane.ParamName);
+		}
+
+		[Test]
+		public void LeaveGroupUnknown()
+		{
+			Assert.DoesNotThrow (() => gm.LeaveGroup (group, person));
+			CollectionAssert.IsEmpty (group.Participants);
+		}
+
+		[Test]
+		public void LeaveGroupNotIn()
+		{
+			group = gm.CreateGroup (person);
+			var p2 = new Person ("2");
+
+			bool updated = false;
+			gm.GroupUpdated += g => updated = true;
+
+			gm.LeaveGroup (group, p2);
+
+			CollectionAssert.DoesNotContain (group.Participants, p2.Identity);
+			CollectionAssert.Contains (group.Participants, person.Identity);
+
+			Assert.IsFalse (updated, "GroupUpdated was fired without any changes");
+		}
+
+		[Test]
+		public void LeaveGroup()
+		{
+			group = gm.CreateGroup (person);
+			var p2 = new Person ("2");
+			gm.JoinGroup (group, p2);
+
+			bool updated = false;
+			gm.GroupUpdated += g => {
+				updated = true;
+				Assert.AreSame (group, g);
+			};
+
+			gm.LeaveGroup (group, p2);
+
+			CollectionAssert.Contains (group.Participants, person.Identity);
+			CollectionAssert.DoesNotContain (group.Participants, p2.Identity);
+			Assert.IsTrue (updated, "GroupUpdated did not fire");
 		}
 	}
 }
