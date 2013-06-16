@@ -75,8 +75,12 @@ namespace Tempest.Social
 			if (!this.groups.TryGetValue (group.Id, out group))
 				return;
 
-			if (group.Participants.Remove (person.Identity))
-				OnGroupUpdated (group);
+			if (!group.Participants.Remove (person.Identity))
+				return;
+
+			OnGroupUpdated (group);
+			if (group.Participants.Count == 0)
+				this.groups.Remove (group.Id);
 		}
 
 		private int nextId;
