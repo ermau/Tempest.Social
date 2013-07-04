@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
@@ -36,16 +37,19 @@ namespace Tempest.Social.Tests
 		[Test]
 		public void CtorInvalid()
 		{
-			Assert.Throws<ArgumentNullException> (() => new Group (1, null));
+			var ane = Assert.Throws<ArgumentNullException> (() => new Group (1, (string)null),
+				"ownerId was allowed to be null");
+			Assert.AreEqual ("ownerId", ane.ParamName);
 		}
 
 		[Test]
 		public void Ctor()
 		{
-			string[] ids = new[] { "foo", "bar" };
-			var g = new Group (1, ids);
+			const string owner = "foo";
+			var g = new Group (1, owner);
 			Assert.AreEqual (1, g.Id);
-			CollectionAssert.AreEqual (ids, g.Participants);
+			Assert.AreEqual (owner, g.OwnerId);
+			CollectionAssert.Contains (g.Participants, owner);
 		}
 	}
 }

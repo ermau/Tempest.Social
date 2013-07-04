@@ -27,30 +27,48 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Tempest.Social
 {
 	public class Group
+		: INotifyPropertyChanged
 	{
 		public Group (int id)
 		{
 			Id = id;
 		}
 
-		public Group (int id, IEnumerable<string> participants)
+		public Group (int id, string ownerId)
 			: this (id)
 		{
-			if (participants == null)
-				throw new ArgumentNullException ("participants");
+			if (ownerId == null)
+				throw new ArgumentNullException ("ownerId");
 
-			foreach (string participant in participants)
-				this.participants.Add (participant);
+			OwnerId = ownerId;
+			this.participants.Add (ownerId);
 		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
 
 		public int Id
 		{
 			get;
 			private set;
+		}
+
+		public string OwnerId
+		{
+			get { return this.ownerId; }
+			set
+			{
+				if (this.ownerId == value)
+					return;
+
+				this.ownerId = value;
+				OnPropertyChanged();
+			}
 		}
 
 		public ICollection<string> Participants
@@ -59,6 +77,14 @@ namespace Tempest.Social
 		}
 
 		private readonly ObservableCollection<string> participants = new ObservableCollection<string>();
+		private string ownerId;	
+
+		protected virtual void OnPropertyChanged ([CallerMemberName] string propertyName = null)
+		{
+			PropertyChangedEventHandler handler = PropertyChanged;
+			if (handler != null)
+				handler (this, new PropertyChangedEventArgs (propertyName));
+		}
 	}
 
 	public class GroupSerializer
@@ -74,7 +100,11 @@ namespace Tempest.Social
 
 		public Group Deserialize (ISerializationContext context, IValueReader reader)
 		{
-			return new Group (reader.ReadInt32(), reader.ReadEnumerable (context, Serializer<string>.Default));
+			var g = new Group (reader.ReadInt32(), reader.ReadString());
+			foreach (string participant in reader.ReadEnumerable (context, Serializer<string>.Default))
+				g.Participants.Add (participant);
+
+			return g;
 		}
 	}
 }

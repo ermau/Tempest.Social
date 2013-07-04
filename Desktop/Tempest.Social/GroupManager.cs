@@ -45,7 +45,7 @@ namespace Tempest.Social
 			while (this.groups.ContainsKey (this.nextId))
 				Interlocked.Increment (ref this.nextId);
 
-			var group = new Group (this.nextId, new[] { person.Identity });
+			var group = new Group (this.nextId, person.Identity);
 			this.groups.Add (group.Id, group);
 
 			return group;
