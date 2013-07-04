@@ -92,6 +92,13 @@ namespace Tempest.Social
 			return response.Group;
 		}
 
+		/// <summary>
+		/// Invites <paramref name="person"/> to the <paramref name="group"/>.
+		/// </summary>
+		/// <param name="group">The group to invite to.</param>
+		/// <param name="person">The person to invite.</param>
+		/// <returns>An <see cref="Invitation" /> containing the response.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="group"/> or <paramref name="person"/> is <c>nulll</c>.</exception>
 		public async Task<Invitation> InviteToGroupAsync (Group group, Person person)
 		{
 			if (group == null)
