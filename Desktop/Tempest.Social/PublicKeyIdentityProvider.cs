@@ -4,7 +4,7 @@
 // Author:
 //   Eric Maupin <me@ermau.com>
 //
-// Copyright (c) 2012 Eric Maupin
+// Copyright (c) 2012-2013 Eric Maupin
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ namespace Tempest.Social
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 			if (connection.RemoteKey == null || connection.RemoteKey.PublicSignature == null)
-				throw new ArgumentException ("Invalid remote key or public signature");
+				return Task.FromResult<string> (null);
 
 			StringBuilder builder = new StringBuilder (connection.RemoteKey.PublicSignature.Length * 2);
 			foreach (byte b in connection.RemoteKey.PublicSignature)

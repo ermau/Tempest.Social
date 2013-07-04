@@ -70,6 +70,9 @@ namespace Tempest.Social
 			if (!found)
 				identity = await this.identityProvider.GetIdentityAsync (connection).ConfigureAwait (false);
 
+			if (identity == null)
+				return null;
+
 			Person person;
 			lock (this.sync)
 			{
