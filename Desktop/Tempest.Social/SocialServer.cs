@@ -47,6 +47,8 @@ namespace Tempest.Social
 			this.provider = provider;
 			this.identityProvider = identityProvider;
 
+			this.groups.GroupUpdated += OnGroupUpdated;
+
 			this.RegisterMessageHandler<PersonMessage> (OnPersonMessage);
 			this.RegisterMessageHandler<BuddyListMessage> (OnBuddyListMessage);
 			this.RegisterMessageHandler<SearchMessage> (OnSearchMessage);
@@ -55,11 +57,12 @@ namespace Tempest.Social
 
 		private readonly IWatchListProvider provider;
 		private readonly IIdentityProvider identityProvider;
-		
+
 		private readonly object sync = new object();
 		private readonly Dictionary<string, Person> people = new Dictionary<string, Person>();
+		private readonly GroupManager groups = new GroupManager();
 		private readonly BidirectionalDictionary<string, IConnection> connections = new BidirectionalDictionary<string, IConnection>();
-		
+
 		private async Task<Person> GetPerson (IConnection connection)
 		{
 			string identity;
@@ -90,29 +93,58 @@ namespace Tempest.Social
 		{
 			Person inviter = await GetPerson (e.Connection);
 
+			int groupId = e.Message.GroupId;
+
 			if (inviter == null || !await this.provider.GetIsWatcherAsync (inviter.Identity, e.Message.Invitee)) {
 				e.Connection.SendResponseAsync (e.Message, new GroupInviteResponse {
-					GroupId = e.Message.GroupId,
+					GroupId = groupId,
 					Response = InvitationResponse.Error
 				});
 				return;
 			}
 
 			bool online;
-			Person invitee;
-			IConnection connection;
+			IConnection connection = null;
 			lock (this.sync) {
+				Person invitee;
 				online = (!this.people.TryGetValue (e.Message.Invitee, out invitee)
-				          || invitee.Status == Status.Offline
-				          || !this.connections.TryGetValue (e.Message.Invitee, out connection));
+				          || invitee.Status == Status.Offline)
+				          && this.connections.TryGetValue (e.Message.Invitee, out connection);
 			}
 
 			if (!online) {
 				e.Connection.SendResponseAsync (e.Message, new GroupInviteResponse {
-					GroupId = e.Message.GroupId,
+					GroupId = groupId,
 					Response = InvitationResponse.Offline
 				});
 			} else {
+				bool error = false;
+				lock (this.sync) {
+					Group group;
+					if (!(error = !this.groups.TryGetGroup (groupId, out group))) {
+						connection.SendFor<GroupInviteResponse> (new GroupInviteMessage {
+							Group = group
+						}).ContinueWith (t => {
+							if (t.Result == null)
+								return;
+
+							if (t.Result.Response == InvitationResponse.Accepted) {
+								lock (this.sync) {
+									group.Participants.Add (e.Message.Invitee);
+								}
+							}
+
+							e.Connection.SendResponseAsync (e.Message, t.Result);
+						});
+					}
+				}
+
+				if (error) {
+					e.Connection.SendResponseAsync (e.Message, new GroupInviteResponse {
+						GroupId = e.Message.GroupId,
+						Response = InvitationResponse.Error
+					});
+				}
 			}
 		}
 
@@ -194,6 +226,21 @@ namespace Tempest.Social
 			}
 
 			base.OnConnectionDisconnected (sender, e);
+		}
+
+		private void OnGroupUpdated (Group group)
+		{
+			var msg = new GroupUpdateMessage { Group = group };
+
+			lock (this.sync)
+			{
+				foreach (string participant in group.Participants)
+				{
+					IConnection connection;
+					if (this.connections.TryGetValue (participant, out connection))
+						connection.SendAsync (msg);
+				}
+			}
 		}
 
 		private async void OnPersonMessage (MessageEventArgs<PersonMessage> e)

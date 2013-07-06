@@ -47,6 +47,7 @@ namespace Tempest.Social
 
 			this.RegisterMessageHandler<RequestBuddyListMessage> (OnRequestBuddyListMessage);
 			this.RegisterMessageHandler<GroupInviteMessage> (OnGroupInviteMessage);
+			this.RegisterMessageHandler<GroupUpdateMessage> (OnGroupUpdatedMessage);
 		}
 
 		/// <summary>
@@ -83,13 +84,42 @@ namespace Tempest.Social
 		}
 
 		/// <summary>
+		/// Gets the groups you're currently a part of.
+		/// </summary>
+		public IEnumerable<Group> Groups
+		{
+			get { return this.groups.Values; }
+		}	
+
+		/// <summary>
 		/// Asynchronously creates a group.
 		/// </summary>
-		/// <returns>The created group.</returns>
+		/// <returns>The created <see cref="Group"/> or <c>null</c> if disconnected.</returns>
 		public async Task<Group> CreateGroupAsync()
 		{
 			var response = await Connection.SendFor<GroupUpdateMessage> (new CreateGroupMessage()).ConfigureAwait (false);
+			if (response == null)
+				return null;
+
+			lock (this.groups)
+				this.groups.Add (response.Group.Id, response.Group);
+
 			return response.Group;
+		}
+
+		/// <summary>
+		/// Asynchronously leaves a group.
+		/// </summary>
+		/// <param name="group">The group to leave.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="group"/> is <c>null</c>.</exception>
+		public async Task LeaveGroupAsync (Group group)
+		{
+			if (group == null)
+				throw new ArgumentNullException ("group");
+
+			await Connection.SendAsync (new LeaveGroupMessage { GroupId = group.Id }).ConfigureAwait (false);
+			lock (this.groups)
+				this.groups.Remove (group.Id);
 		}
 
 		/// <summary>
@@ -97,8 +127,8 @@ namespace Tempest.Social
 		/// </summary>
 		/// <param name="group">The group to invite to.</param>
 		/// <param name="person">The person to invite.</param>
-		/// <returns>An <see cref="Invitation" /> containing the response.</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="group"/> or <paramref name="person"/> is <c>nulll</c>.</exception>
+		/// <returns>An <see cref="Invitation" /> containing the response or <c>null</c> if disconnected.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="group"/> or <paramref name="person"/> is <c>null</c>.</exception>
 		public async Task<Invitation> InviteToGroupAsync (Group group, Person person)
 		{
 			if (group == null)
@@ -112,6 +142,9 @@ namespace Tempest.Social
 					GroupId = group.Id
 				}).ConfigureAwait (false);
 
+			if (response == null)
+				return null;
+
 			return new Invitation (group, person, response.Response);
 		}
 
@@ -119,7 +152,7 @@ namespace Tempest.Social
 		/// Searches for users with a similar <paramref name="nickname"/>.
 		/// </summary>
 		/// <param name="nickname">The nickname to search for.</param>
-		/// <returns>Any users that at least partially match the nickname.</returns>
+		/// <returns>Any users that at least partially match the nickname or <c>null</c> if disconnected.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="nickname"/> is <c>null</c>.</exception>
 		/// <exception cref="ArgumentException"><paramref name="nickname"/> is empty.</exception>
 		public async Task<IEnumerable<Person>> SearchAsync (string nickname)
@@ -130,11 +163,15 @@ namespace Tempest.Social
 				throw new ArgumentException ("nickname can not be empty", "nickname");
 
 			var response = await Connection.SendFor<SearchResultMessage> (new SearchMessage { Nickname = nickname }).ConfigureAwait (false);
+			if (response == null)
+				return null;
+
 			return response.Results;
 		}
 
 		private readonly WatchList watchList;
 		private readonly Person persona;
+		private readonly ObservableDictionary<int, Group> groups = new ObservableDictionary<int, Group>();
 
 		private void OnPersonaPropertyChanged (object sender, PropertyChangedEventArgs e)
 		{
@@ -148,15 +185,44 @@ namespace Tempest.Social
 			base.OnConnected (e);
 		}
 
+		private void OnGroupUpdatedMessage (MessageEventArgs<GroupUpdateMessage> e)
+		{
+			lock (this.groups) {
+				Group group;
+				if (!this.groups.TryGetValue (e.Message.Group.Id, out group))
+					return;
+
+				HashSet<string> newSet = new HashSet<string> (e.Message.Group.Participants);
+				newSet.ExceptWith (group.Participants);
+
+				HashSet<string> removedSet = new HashSet<string> (group.Participants);
+				removedSet.ExceptWith (e.Message.Group.Participants);
+
+				foreach (string id in removedSet) {
+					group.Participants.Remove (id);
+				}
+
+				foreach (string id in newSet) {
+					group.Participants.Add (id);
+				}
+
+				group.OwnerId = e.Message.Group.OwnerId;
+			}
+		}
+
 		private void OnGroupInviteMessage (MessageEventArgs<GroupInviteMessage> e)
 		{
-			var args = new GroupInviteEventArgs (e.Message.Group);
-			OnGroupInvite (args);
+			Task.Factory.StartNew (s => {
+				var msg = (GroupInviteMessage)s;
+				
+				var args = new GroupInviteEventArgs (msg.Group);
+				OnGroupInvite (args);
 
-			Connection.SendAsync (new GroupInviteResponse {
-				GroupId = e.Message.Group.Id,
-				Response = (args.AcceptInvite) ? InvitationResponse.Accepted : InvitationResponse.Rejected
-			});
+				Connection.SendResponseAsync (new GroupInviteResponse {
+					GroupId = msg.Group.Id,
+					Response = (args.AcceptInvite) ? InvitationResponse.Accepted : InvitationResponse.Rejected
+				}, msg);
+			}, e.Message);
 		}
 
 		private void OnRequestBuddyListMessage (MessageEventArgs<RequestBuddyListMessage> e)
