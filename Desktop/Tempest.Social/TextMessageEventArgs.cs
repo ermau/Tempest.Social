@@ -1,5 +1,5 @@
 ﻿//
-// TextMessage.cs
+// TextMessageEventArgs.cs
 //
 // Author:
 //   Eric Maupin <me@ermau.com>
@@ -29,48 +29,31 @@ using System.Linq;
 
 namespace Tempest.Social
 {
-	public class TextMessage
-		: SocialMessage
+	public class TextMessageEventArgs
+		: GroupEventArgs
 	{
-		public TextMessage()
-			: base (SocialMessageType.Text)
+		public TextMessageEventArgs (Group group, Person person, string message)
+			: base (group)
 		{
+			if (person == null)
+				throw new ArgumentNullException ("person");
+			if (message == null)
+				throw new ArgumentNullException ("message");
+
+			Person = person;
+			Message = message;
 		}
 
-		public int GroupId
+		public Person Person
 		{
 			get;
-			set;
+			private set;
 		}
 
-		public string SenderId
+		public string Message
 		{
 			get;
-			set;
-		}
-
-		public string Text
-		{
-			get;
-			set;
-		}
-
-		public override void WritePayload (ISerializationContext context, IValueWriter writer)
-		{
-			if (writer.WriteBool (SenderId != null))
-				writer.WriteString (SenderId);
-
-			writer.WriteInt32 (GroupId);
-			writer.WriteString (Text);
-		}
-
-		public override void ReadPayload (ISerializationContext context, IValueReader reader)
-		{
-			if (reader.ReadBool())
-				SenderId = reader.ReadString();
-
-			GroupId = reader.ReadInt32();
-			Text = reader.ReadString();
+			private set;
 		}
 	}
 }

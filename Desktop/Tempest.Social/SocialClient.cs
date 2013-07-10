@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -48,6 +49,7 @@ namespace Tempest.Social
 			this.RegisterMessageHandler<RequestBuddyListMessage> (OnRequestBuddyListMessage);
 			this.RegisterMessageHandler<GroupInviteMessage> (OnGroupInviteMessage);
 			this.RegisterMessageHandler<GroupUpdateMessage> (OnGroupUpdatedMessage);
+			this.RegisterMessageHandler<TextMessage> (OnTextMessage);
 		}
 
 		/// <summary>
@@ -66,6 +68,11 @@ namespace Tempest.Social
 		/// You have been invited to join a group.
 		/// </summary>
 		public event EventHandler<GroupInviteEventArgs> InvitedToGroup;
+
+		/// <summary>
+		/// You have received a text message in a group.
+		/// </summary>
+		public event EventHandler<TextMessageEventArgs> ReceivedTextMessage;
 
 		/// <summary>
 		/// Gets your <see cref="Person"/>.
@@ -89,7 +96,7 @@ namespace Tempest.Social
 		public IEnumerable<Group> Groups
 		{
 			get { return this.groups.Values; }
-		}	
+		}
 
 		/// <summary>
 		/// Asynchronously creates a group.
@@ -169,6 +176,25 @@ namespace Tempest.Social
 			return response.Results;
 		}
 
+		/// <summary>
+		/// Asynchronously sends a text message to a <paramref name="group"/>.
+		/// </summary>
+		/// <param name="group">The group to send the message to.</param>
+		/// <param name="text">The message to send.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="group"/> or <paramref name="text"/> is <c>null</c>.</exception>
+		public Task SendTextAsync (Group group, string text)
+		{
+			if (group == null)
+				throw new ArgumentNullException ("group");
+			if (text == null)
+				throw new ArgumentNullException ("text");
+
+			return Connection.SendAsync (new TextMessage {
+				GroupId = group.Id,
+				Text = text
+			});
+		}
+
 		private readonly WatchList watchList;
 		private readonly Person persona;
 		private readonly ObservableDictionary<int, Group> groups = new ObservableDictionary<int, Group>();
@@ -183,6 +209,26 @@ namespace Tempest.Social
 			Connection.SendAsync (new PersonMessage { Person = Persona });
 
 			base.OnConnected (e);
+		}
+
+		private void OnTextMessage (MessageEventArgs<TextMessage> e)
+		{
+			Group group;
+			lock (this.groups) {
+				if (!this.groups.TryGetValue (e.Message.GroupId, out group))
+					return;
+			}
+
+			if (e.Message.SenderId == null) {
+				Trace.TraceWarning ("TextMessage received with no sender");
+				return;
+			}
+
+			Person sender;
+			if (!this.watchList.TryGetPerson (e.Message.SenderId, out sender))
+				return;
+
+			OnTextMessageReceived (new TextMessageEventArgs (group, sender, e.Message.Text));
 		}
 
 		private void OnGroupUpdatedMessage (MessageEventArgs<GroupUpdateMessage> e)
@@ -228,6 +274,13 @@ namespace Tempest.Social
 		private void OnRequestBuddyListMessage (MessageEventArgs<RequestBuddyListMessage> e)
 		{
 			Task.Factory.StartNew (OnBuddyListRequested);
+		}
+
+		private void OnTextMessageReceived (TextMessageEventArgs args)
+		{
+			var handler = ReceivedTextMessage;
+			if (handler != null)
+				handler (this, args);
 		}
 
 		private void OnGroupInvite (GroupInviteEventArgs args)

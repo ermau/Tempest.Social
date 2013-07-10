@@ -60,6 +60,7 @@
     <Compile Include="Protocol\SearchMessage.cs" />
     <Compile Include="Protocol\SearchResultMessage.cs" />
     <Compile Include="Protocol\TextMessage.cs" />
+    <Compile Include="TextMessageEventArgs.cs" />
     <Compile Include="WatchList.cs" />
     <Compile Include="IIdentityProvider.cs" />
     <Compile Include="IWatchListProvider.cs">
