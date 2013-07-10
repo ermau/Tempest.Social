@@ -53,6 +53,7 @@ namespace Tempest.Social
 			this.RegisterMessageHandler<BuddyListMessage> (OnBuddyListMessage);
 			this.RegisterMessageHandler<SearchMessage> (OnSearchMessage);
 			this.RegisterMessageHandler<InviteToGroupMessage> (OnInviteToGroupMessage);
+			this.RegisterMessageHandler<TextMessage> (OnTextMessage);
 		}
 
 		private readonly IWatchListProvider provider;
@@ -241,6 +242,41 @@ namespace Tempest.Social
 						connection.SendAsync (msg);
 				}
 			}
+		}
+
+		private void Broadcast (Group group, Message message)
+		{
+			var broadcastTo = new List<IConnection> (group.Participants.Count);
+			lock (this.sync) {
+				foreach (string id in group.Participants) {
+					IConnection connection;
+					if (this.connections.TryGetValue (id, out connection))
+						broadcastTo.Add (connection);
+				}
+			}
+
+			broadcastTo.Send (message);
+		}
+
+		private void OnTextMessage (MessageEventArgs<TextMessage> e)
+		{
+			string sender;
+			Group group;
+			lock (this.sync) {
+				if (!this.connections.TryGetKey (e.Connection, out sender))
+					return;
+
+				if (!this.groups.TryGetGroup (e.Message.GroupId, out group))
+					return;
+			}
+
+			var msg = new TextMessage {
+				GroupId = e.Message.GroupId,
+				SenderId = sender,
+				Text = e.Message.Text
+			};
+
+			Broadcast (group, msg);
 		}
 
 		private async void OnPersonMessage (MessageEventArgs<PersonMessage> e)
