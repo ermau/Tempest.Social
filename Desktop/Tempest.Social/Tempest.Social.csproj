@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="ConnectEventArgs.cs" />
     <Compile Include="Group.cs" />
+    <Compile Include="GroupEventArgs.cs" />
     <Compile Include="GroupInviteEventArgs.cs" />
     <Compile Include="GroupManager.cs" />
     <Compile Include="Invitation.cs" />

@@ -30,20 +30,11 @@ using System.Linq;
 namespace Tempest.Social
 {
 	public class GroupInviteEventArgs
-		: EventArgs
+		: GroupEventArgs
 	{
 		public GroupInviteEventArgs (Group group)
+			: base (group)
 		{
-			if (group == null)
-				throw new ArgumentNullException ("group");
-			
-			Group = group;
-		}
-
-		public Group Group
-		{
-			get;
-			private set;
 		}
 
 		public bool AcceptInvite
