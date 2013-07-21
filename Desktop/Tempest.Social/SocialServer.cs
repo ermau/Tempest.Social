@@ -227,22 +227,13 @@ namespace Tempest.Social
 			if (identity != null)
 			{
 				Person person;
-				lock (this.sync)
-					this.people.TryGetValue (identity, out person);
+				lock (this.sync) {
+					if (this.people.TryGetValue (identity, out person))
+						person.Status = Status.Offline;
+				}
 
 				if (person != null)
-				{
-					var watchers = await this.provider.GetWatchersAsync (person.Identity).ConfigureAwait (false);
-					foreach (var watcher in watchers)
-					{
-						IConnection connection;
-						lock (this.sync)
-							this.connections.TryGetValue (watcher.Identity, out connection);
-
-						if (connection != null)
-							connection.SendAsync (new PersonMessage (person));
-					}
-				}
+					await UpdatePersonAsync (person);
 			}
 
 			base.OnConnectionDisconnected (sender, e);
@@ -298,6 +289,19 @@ namespace Tempest.Social
 			Broadcast (group, msg);
 		}
 
+		private async Task UpdatePersonAsync (Person person)
+		{
+			foreach (Person watcher in await this.provider.GetWatchersAsync (person.Identity)) {
+				IConnection connection;
+				lock (this.sync) {
+					if (!this.connections.TryGetValue (watcher.Identity, out connection))
+						continue;
+				}
+
+				await connection.SendAsync (new PersonMessage { Person = person });
+			}
+		}
+
 		private async void OnPersonMessage (MessageEventArgs<PersonMessage> e)
 		{
 			string identity = await this.identityProvider.GetIdentityAsync (e.Connection);
@@ -340,17 +344,7 @@ namespace Tempest.Social
 				}
 			}
 
-			foreach (Person watcher in await this.provider.GetWatchersAsync (identity))
-			{
-				IConnection connection;
-				lock (this.sync)
-				{
-					if (!this.connections.TryGetValue (watcher.Identity, out connection))
-						continue;
-				}
-
-				connection.SendAsync (new PersonMessage { Person = e.Message.Person });
-			}
+			await UpdatePersonAsync (e.Message.Person);
 		}
 	}
 }
