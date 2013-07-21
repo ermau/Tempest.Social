@@ -106,7 +106,7 @@ namespace Tempest.Social
 
 			bool isWatcher;
 			lock (this.watchLists)
-				isWatcher = this.watchLists[watchee].Contains (watchee);
+				isWatcher = this.watchLists[watcher].Contains (watchee);
 
 			return Task.FromResult (isWatcher);
 		}

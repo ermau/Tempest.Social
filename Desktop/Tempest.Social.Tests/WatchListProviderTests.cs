@@ -165,6 +165,26 @@ namespace Tempest.Social.Tests
 		}
 
 		[Test]
+		public void GetIsWatcherAsyncInvalid()
+		{
+			IWatchListProvider provider = GetProvider();
+
+			Assert.That (() => provider.GetIsWatcherAsync (null, "asdf"), Throws.InstanceOf<ArgumentNullException>());
+			Assert.That (() => provider.GetIsWatcherAsync ("asdf", null), Throws.InstanceOf<ArgumentNullException>());
+		}
+
+		[Test]
+		public void GetIsWatcherAsync()
+		{
+			IWatchListProvider provider = GetProvider();
+
+			provider.AddAsync (personA, personB).Wait();
+
+			Assert.That (provider.GetIsWatcherAsync (personA.Identity, personB.Identity).Result, Is.True);
+			Assert.That (provider.GetIsWatcherAsync (personB.Identity, personA.Identity).Result, Is.False);
+		}
+
+		[Test]
 		public void GetWatchers()
 		{
 			IWatchListProvider provider = GetProvider();
