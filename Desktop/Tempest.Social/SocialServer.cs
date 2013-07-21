@@ -54,6 +54,7 @@ namespace Tempest.Social
 			this.RegisterMessageHandler<SearchMessage> (OnSearchMessage);
 			this.RegisterMessageHandler<InviteToGroupMessage> (OnInviteToGroupMessage);
 			this.RegisterMessageHandler<TextMessage> (OnTextMessage);
+			this.RegisterMessageHandler<CreateGroupMessage> (OnCreateGroupMessage);
 		}
 
 		private readonly IWatchListProvider provider;
@@ -64,7 +65,7 @@ namespace Tempest.Social
 		private readonly GroupManager groups = new GroupManager();
 		private readonly BidirectionalDictionary<string, IConnection> connections = new BidirectionalDictionary<string, IConnection>();
 
-		private async Task<Person> GetPerson (IConnection connection)
+		private async Task<Person> GetPersonAsync (IConnection connection)
 		{
 			string identity;
 			bool found;
@@ -90,9 +91,27 @@ namespace Tempest.Social
 			return person;
 		}
 
+		private async void OnCreateGroupMessage (MessageEventArgs<CreateGroupMessage> e)
+		{
+			Person person = await GetPersonAsync (e.Connection);
+			if (person == null) {
+				e.Connection.DisconnectAsync();
+				return;
+			}
+
+			Group group;
+			lock (this.sync) {
+				group = this.groups.CreateGroup (person);
+			}
+
+			e.Connection.SendResponseAsync (e.Message, new GroupUpdateMessage {
+				Group = group
+			});
+		}
+
 		private async void OnInviteToGroupMessage (MessageEventArgs<InviteToGroupMessage> e)
 		{
-			Person inviter = await GetPerson (e.Connection);
+			Person inviter = await GetPersonAsync (e.Connection);
 
 			int groupId = e.Message.GroupId;
 
@@ -176,7 +195,7 @@ namespace Tempest.Social
 
 		private async void OnBuddyListMessage (MessageEventArgs<BuddyListMessage> e)
 		{
-			Person owner = await GetPerson (e.Connection);
+			Person owner = await GetPersonAsync (e.Connection);
 			if (owner == null)
 			{
 				e.Connection.DisconnectAsync (ConnectionResult.Custom, "Identity not found or verified");
