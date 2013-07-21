@@ -95,6 +95,7 @@ namespace Tempest.Social
 		public void Serialize (ISerializationContext context, IValueWriter writer, Group element)
 		{
 			writer.WriteInt32 (element.Id);
+			writer.WriteString (element.OwnerId);
 			writer.WriteEnumerable (context, Serializer<string>.Default, element.Participants);
 		}
 
