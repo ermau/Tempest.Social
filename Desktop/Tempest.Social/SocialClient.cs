@@ -264,10 +264,10 @@ namespace Tempest.Social
 				var args = new GroupInviteEventArgs (msg.Group);
 				OnGroupInvite (args);
 
-				Connection.SendResponseAsync (new GroupInviteResponse {
+				Connection.SendResponseAsync (msg, new GroupInviteResponse {
 					GroupId = msg.Group.Id,
 					Response = (args.AcceptInvite) ? InvitationResponse.Accepted : InvitationResponse.Rejected
-				}, msg);
+				});
 			}, e.Message);
 		}
 
