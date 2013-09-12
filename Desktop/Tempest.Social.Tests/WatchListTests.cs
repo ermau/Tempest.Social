@@ -58,7 +58,7 @@ namespace Tempest.Social.Tests
 			var c = new MockClientConnection (provider);
 			client = new ConnectionBuffer (c);
 
-			clientContext = new SerializationContext (c, SocialProtocol.Instance, new TypeMap());
+			clientContext = new SerializationContext (c, SocialProtocol.Instance);
 
 			var context = new TempestClient (c, MessageTypes.Reliable);
 			context.ConnectAsync (new Target (Target.LoopbackIP, 1)).Wait();

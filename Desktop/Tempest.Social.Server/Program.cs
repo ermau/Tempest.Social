@@ -15,7 +15,7 @@ namespace Tempest.Social.Server
 		{
 			Console.WriteLine ("Getting server key...");
 
-			IAsymmetricKey key = GetKey ("server.key");
+			RSAAsymmetricKey key = GetKey ("server.key");
 
 			Console.WriteLine ("Got it.");
 
@@ -47,9 +47,9 @@ namespace Tempest.Social.Server
 			Console.WriteLine ("Connection made");
 		}
 
-		private static IAsymmetricKey GetKey (string path)
+		private static RSAAsymmetricKey GetKey (string path)
 		{
-			IAsymmetricKey key = null;
+			RSAAsymmetricKey key = null;
 			if (!File.Exists (path))
 			{
 				RSACrypto crypto = new RSACrypto();
