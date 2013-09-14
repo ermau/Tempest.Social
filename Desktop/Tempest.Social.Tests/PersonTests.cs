@@ -49,5 +49,28 @@ namespace Tempest.Social.Tests
 			Assert.AreEqual (id, person.Identity);
 			Assert.AreEqual (Status.Offline, person.Status);
 		}
+
+		[Test]
+		public void Serialize()
+		{
+			var person = new Person ("foobar") {
+				Nickname = "MyNickname",
+				Avatar = "MyAvatar",
+				Status = Status.Away
+			};
+
+			byte[] buffer = new byte[2048];
+			var bufferWriter = new BufferValueWriter (buffer);
+
+			person.Serialize (null, bufferWriter);
+
+			var bufferReader = new BufferValueReader (buffer);
+			var person2 = new Person (null, bufferReader);
+
+			Assert.AreEqual (person.Identity, person2.Identity);
+			Assert.AreEqual (person.Nickname, person2.Nickname);
+			Assert.AreEqual (person.Avatar, person2.Avatar);
+			Assert.AreEqual (person.Status, person2.Status);
+		}
 	}
 }

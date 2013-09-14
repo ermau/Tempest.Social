@@ -71,6 +71,22 @@ namespace Tempest.Social
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the avatar url or gravatar email.
+		/// </summary>
+		public string Avatar
+		{
+			get { return this.avatar; }
+			set
+			{
+				if (this.avatar == value)
+					return;
+
+				this.avatar = value;
+				OnPropertyChanged();
+			}
+		}
+
 		public string Identity
 		{
 			get;
@@ -94,6 +110,7 @@ namespace Tempest.Social
 		{
 			writer.WriteString (Identity);
 			writer.WriteString (Nickname);
+			writer.WriteString (Avatar);
 			writer.WriteByte ((byte)Status);
 		}
 
@@ -101,6 +118,7 @@ namespace Tempest.Social
 		{
 			Identity = reader.ReadString();
 			Nickname = reader.ReadString();
+			Avatar = reader.ReadString();
 			Status = (Status)reader.ReadByte();
 		}
 
@@ -142,7 +160,7 @@ namespace Tempest.Social
 			return !Equals (left, right);
 		}
 
-		private string nickname;
+		private string nickname, avatar;
 		private Status status;
 
 		private void OnPropertyChanged ([CallerMemberName] string propertyName = null)
