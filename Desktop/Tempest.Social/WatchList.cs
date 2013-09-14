@@ -67,10 +67,14 @@ namespace Tempest.Social
 			if (item == null)
 				throw new ArgumentNullException ("item");
 
-			lock (this.people)
-				this.people.Add (item);
+			bool added;
+			lock (this.people) {
+				if (added = !this.people.Contains (item))
+					this.people.Add (item);
+			}
 
-			Send (NotifyCollectionChangedAction.Add, item);
+			if (added)
+				Send (NotifyCollectionChangedAction.Add, item);
 		}
 
 		public void Clear()
