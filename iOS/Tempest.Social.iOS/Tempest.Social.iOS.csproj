@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{DB758AD2-4073-4512-8DA9-90AB433B6437}</ProjectGuid>
+    <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Tempest.Social</RootNamespace>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <AssemblyName>Tempest.Social.iOS</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <MtouchDebug>true</MtouchDebug>
+    <CodesignKey>iPhone Developer</CodesignKey>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhone\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <CodesignKey>iPhone Developer</CodesignKey>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Desktop\Tempest.Social\ConnectEventArgs.cs">
+      <Link>ConnectEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Extensions.cs">
+      <Link>Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Group.cs">
+      <Link>Group.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\GroupEventArgs.cs">
+      <Link>GroupEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\GroupInviteEventArgs.cs">
+      <Link>GroupInviteEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\GroupManager.cs">
+      <Link>GroupManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\IIdentityProvider.cs">
+      <Link>IIdentityProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Invitation.cs">
+      <Link>Invitation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\IWatchListProvider.cs">
+      <Link>IWatchListProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\MemoryWatchListProvider.cs">
+      <Link>MemoryWatchListProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\ObservableDictionary.cs">
+      <Link>ObservableDictionary.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Person.cs">
+      <Link>Person.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\PersonIdentityEqualityComparer.cs">
+      <Link>PersonIdentityEqualityComparer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\BuddyListMessage.cs">
+      <Link>Protocol\BuddyListMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\CreateGroupMessage.cs">
+      <Link>Protocol\CreateGroupMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\GroupConnectionMessage.cs">
+      <Link>Protocol\GroupConnectionMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\GroupInviteMessage.cs">
+      <Link>Protocol\GroupInviteMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\GroupInviteResponse.cs">
+      <Link>Protocol\GroupInviteResponse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\GroupUpdateMessage.cs">
+      <Link>Protocol\GroupUpdateMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\InviteToGroupMessage.cs">
+      <Link>Protocol\InviteToGroupMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\LeaveGroupMessage.cs">
+      <Link>Protocol\LeaveGroupMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\PersonMessage.cs">
+      <Link>Protocol\PersonMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\RequestBuddyListMessage.cs">
+      <Link>Protocol\RequestBuddyListMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\SearchMessage.cs">
+      <Link>Protocol\SearchMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\SearchResultMessage.cs">
+      <Link>Protocol\SearchResultMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\SocialMessage.cs">
+      <Link>Protocol\SocialMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\TextMessage.cs">
+      <Link>Protocol\TextMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\PublicKeyIdentityProvider.cs">
+      <Link>PublicKeyIdentityProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\SocialClient.cs">
+      <Link>SocialClient.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\SocialServer.cs">
+      <Link>SocialServer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\TextMessageEventArgs.cs">
+      <Link>TextMessageEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\WatchList.cs">
+      <Link>WatchList.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Tempest\iOS\Tempest\Tempest.iOS.csproj">
+      <Project>{7994a7c5-fbc5-486e-a345-0b7499a34589}</Project>
+      <Name>Tempest.iOS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Cadenza">
+      <HintPath>..\..\Libraries\Cadenza.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="monotouch" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
+</Project>
