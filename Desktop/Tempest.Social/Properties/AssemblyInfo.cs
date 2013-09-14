@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Tempest.Social")]
-[assembly: AssemblyCopyright("Copyright © Eric Maupin 2012")]
+[assembly: AssemblyCopyright("Copyright © Eric Maupin 2012-2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -168,7 +168,7 @@ namespace Tempest.Social
 			}
 		}
 
-		private void OnSearchMessage (MessageEventArgs<SearchMessage> e)
+		private async void OnSearchMessage (MessageEventArgs<SearchMessage> e)
 		{
 			string nickname = e.Message.Nickname;
 			if (String.IsNullOrWhiteSpace (nickname))
@@ -177,6 +177,8 @@ namespace Tempest.Social
 				return;
 			}
 
+			Person searcher = await GetPersonAsync (e.Connection);
+
 			nickname = nickname.ToLower();
 
 			Person[] pool;
@@ -184,8 +186,10 @@ namespace Tempest.Social
 				pool = this.people.Values.ToArray();
 
 			List<Person> results = new List<Person>();
-			foreach (Person person in pool)
-			{
+			foreach (Person person in pool) {
+				if (person == searcher)
+					continue;
+
 				if (person.Nickname.ToLower().Contains (nickname))
 					results.Add (person);
 			}
