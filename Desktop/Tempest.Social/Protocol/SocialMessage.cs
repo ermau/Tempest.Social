@@ -24,6 +24,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+using TypePair = System.Collections.Generic.KeyValuePair<System.Type,System.Func<Tempest.Message>>;
+
 namespace Tempest.Social
 {
 	public enum SocialMessageType
@@ -119,7 +122,20 @@ namespace Tempest.Social
 
 		static SocialProtocol()
 		{
-			Instance.DiscoverFromAssemblyOf<SocialMessage>();
+			Instance.Register(new [] {
+				new TypePair (typeof(BuddyListMessage), () => new BuddyListMessage()),
+				new TypePair (typeof(CreateGroupMessage), () => new CreateGroupMessage()),
+				new TypePair (typeof(GroupConnectionMessage), () => new GroupConnectionMessage()), 
+				new TypePair (typeof(GroupInviteMessage), () => new GroupInviteMessage()),
+				new TypePair (typeof(GroupUpdateMessage), () => new GroupUpdateMessage()),
+				new TypePair (typeof(InviteToGroupMessage), () => new InviteToGroupMessage()),
+				new TypePair (typeof(LeaveGroupMessage), () => new LeaveGroupMessage()),
+				new TypePair (typeof(PersonMessage), () => new PersonMessage()),
+				new TypePair (typeof(RequestBuddyListMessage), () => new RequestBuddyListMessage()),
+				new TypePair (typeof(SearchMessage), () => new SearchMessage()),
+				new TypePair (typeof(SearchResultMessage), () => new SearchResultMessage()),
+				new TypePair (typeof(TextMessage), () => new TextMessage()),
+			});
 		}
 	}
 }
