@@ -171,6 +171,7 @@ namespace Tempest.Social
 					return;
 
 				person.Nickname = e.Message.Person.Nickname;
+				person.Avatar = e.Message.Person.Avatar;
 				person.Status = e.Message.Person.Status;
 			}
 		}

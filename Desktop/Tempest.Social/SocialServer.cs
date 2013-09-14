@@ -322,6 +322,7 @@ namespace Tempest.Social
 				if (this.people.TryGetValue (identity, out person))
 				{
 					person.Nickname = e.Message.Person.Nickname;
+					person.Avatar = e.Message.Person.Avatar;
 					person.Status = e.Message.Person.Status;
 				}
 				else
