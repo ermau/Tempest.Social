@@ -19,16 +19,10 @@ namespace Tempest.Social.Server
 
 			Console.WriteLine ("Got it.");
 
-			//var provider = new NetworkConnectionProvider (
-			//	new[] { SocialProtocol.Instance },
-			//	new IPEndPoint (IPAddress.Any, 42912),
-			//	10000,
-			//	() => new RSACrypto(),
-			//	key);
-
-			var provider = new UdpConnectionProvider (
-				SocialProtocol.DefaultPort,
-				SocialProtocol.Instance,
+			var provider = new NetworkConnectionProvider (
+				new[] { SocialProtocol.Instance },
+				new Target (Target.AnyIP, 42912),
+				10000,
 				key);
 
 			SocialServer server = new SocialServer (new MemoryWatchListProvider(), IdentityProvider);
