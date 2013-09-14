@@ -58,6 +58,9 @@ namespace Tempest.Social
 			Deserialize (context, reader);
 		}
 
+		/// <summary>
+		/// Gets or sets the person's nickname.
+		/// </summary>
 		public string Nickname
 		{
 			get { return this.nickname; }
@@ -87,12 +90,18 @@ namespace Tempest.Social
 			}
 		}
 
+		/// <summary>
+		/// Gets the unique identifier for this person.
+		/// </summary>
 		public string Identity
 		{
 			get;
 			private set;
 		}
 
+		/// <summary>
+		/// Gets or sets the person's availability status.
+		/// </summary>
 		public Status Status
 		{
 			get { return this.status; }
