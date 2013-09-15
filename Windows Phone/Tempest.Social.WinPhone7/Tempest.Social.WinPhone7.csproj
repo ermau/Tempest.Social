@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{EA349FA5-2A17-48FC-A663-401E05137A9C}</ProjectGuid>
+    <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Tempest.Social.WinPhone7</RootNamespace>
+    <AssemblyName>Tempest.Social.WinPhone7</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <TargetFrameworkProfile>WindowsPhone71</TargetFrameworkProfile>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Threading.Tasks">
+      <HintPath>..\..\packages\Microsoft.Bcl.Async.1.0.16\lib\sl4-windowsphone71\Microsoft.Threading.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions">
+      <HintPath>..\..\packages\Microsoft.Bcl.Async.1.0.16\lib\sl4-windowsphone71\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions.Phone">
+      <HintPath>..\..\packages\Microsoft.Bcl.Async.1.0.16\lib\sl4-windowsphone71\Microsoft.Threading.Tasks.Extensions.Phone.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime">
+      <HintPath>..\..\packages\Microsoft.Bcl.1.0.19\lib\sl4-windowsphone71\System.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks">
+      <HintPath>..\..\packages\Microsoft.Bcl.1.0.19\lib\sl4-windowsphone71\System.Threading.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Net" />
+    <Reference Include="mscorlib.extensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Desktop\Tempest.Social\ConnectEventArgs.cs">
+      <Link>ConnectEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Extensions.cs">
+      <Link>Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Group.cs">
+      <Link>Group.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\GroupEventArgs.cs">
+      <Link>GroupEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\GroupInviteEventArgs.cs">
+      <Link>GroupInviteEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\GroupManager.cs">
+      <Link>GroupManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\IIdentityProvider.cs">
+      <Link>IIdentityProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Invitation.cs">
+      <Link>Invitation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\IWatchListProvider.cs">
+      <Link>IWatchListProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\MemoryWatchListProvider.cs">
+      <Link>MemoryWatchListProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\ObservableDictionary.cs">
+      <Link>ObservableDictionary.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Person.cs">
+      <Link>Person.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\PersonIdentityEqualityComparer.cs">
+      <Link>PersonIdentityEqualityComparer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\BuddyListMessage.cs">
+      <Link>Protocols\BuddyListMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\CreateGroupMessage.cs">
+      <Link>Protocols\CreateGroupMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\GroupConnectionMessage.cs">
+      <Link>Protocols\GroupConnectionMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\GroupInviteMessage.cs">
+      <Link>Protocols\GroupInviteMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\GroupInviteResponse.cs">
+      <Link>Protocols\GroupInviteResponse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\GroupUpdateMessage.cs">
+      <Link>Protocols\GroupUpdateMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\InviteToGroupMessage.cs">
+      <Link>Protocols\InviteToGroupMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\LeaveGroupMessage.cs">
+      <Link>Protocols\LeaveGroupMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\PersonMessage.cs">
+      <Link>Protocols\PersonMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\RequestBuddyListMessage.cs">
+      <Link>Protocols\RequestBuddyListMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\SearchMessage.cs">
+      <Link>Protocols\SearchMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\SearchResultMessage.cs">
+      <Link>Protocols\SearchResultMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\SocialMessage.cs">
+      <Link>Protocols\SocialMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\TextMessage.cs">
+      <Link>Protocols\TextMessage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\PublicKeyIdentityProvider.cs">
+      <Link>PublicKeyIdentityProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\SocialClient.cs">
+      <Link>SocialClient.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\SocialServer.cs">
+      <Link>SocialServer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\TextMessageEventArgs.cs">
+      <Link>TextMessageEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\WatchList.cs">
+      <Link>WatchList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Tempest\iOS\Tempest\TraceSwitch.cs">
+      <Link>System\TraceSwitch.cs</Link>
+    </Compile>
+    <Compile Include="Cadenza\BidirectionalDictionary.cs" />
+    <Compile Include="Cadenza\BidirectionalLookup.cs" />
+    <Compile Include="Cadenza\IMutableLookup.cs" />
+    <Compile Include="Cadenza\MutableLookup.cs" />
+    <Compile Include="System\HashPrimeNumbers.cs" />
+    <Compile Include="System\HashSet.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Tempest\Windows Phone\Tempest\Tempest.WinPhone.csproj">
+      <Project>{973EE310-685C-4E1B-9A62-629094B709E5}</Project>
+      <Name>Tempest.WinPhone</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <ProjectExtensions />
+  <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.8\tools\Microsoft.Bcl.Build.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
