@@ -65,7 +65,7 @@ namespace Tempest.Social
 		private readonly GroupManager groups = new GroupManager();
 		private readonly BidirectionalDictionary<string, IConnection> connections = new BidirectionalDictionary<string, IConnection>();
 
-		private async Task<Person> GetPersonAsync (IConnection connection)
+		protected async Task<Person> GetPersonAsync (IConnection connection)
 		{
 			string identity;
 			bool found;
