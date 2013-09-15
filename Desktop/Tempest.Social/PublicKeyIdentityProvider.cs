@@ -38,14 +38,13 @@ namespace Tempest.Social
 			if (connection == null)
 				throw new ArgumentNullException ("connection");
 			if (connection.RemoteKey == null || connection.RemoteKey.PublicSignature == null)
-				return Task.FromResult<string> (null);
+				return Extensions.CreateTask<string> (null);
 
 			StringBuilder builder = new StringBuilder (connection.RemoteKey.PublicSignature.Length * 2);
 			foreach (byte b in connection.RemoteKey.PublicSignature)
 				builder.Append (b.ToString ("X2"));
 
-			string fingerprint = builder.ToString();
-			return Task.FromResult (fingerprint);
+			return builder.ToString().CreateTask();
 		}
 	}
 }

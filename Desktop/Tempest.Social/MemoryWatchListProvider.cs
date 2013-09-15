@@ -49,7 +49,7 @@ namespace Tempest.Social
 				this.watchLists.Add (listOwner.Identity, target.Identity);
 			}
 
-			return Task.FromResult (true);
+			return true.CreateTask();
 		}
 
 		public Task AddRangeAsync (Person listOwner, IEnumerable<Person> targets)
@@ -70,7 +70,7 @@ namespace Tempest.Social
 				}
 			}
 
-			return Task.FromResult (true);
+			return true.CreateTask();
 		}
 
 		public Task RemoveAsync (string listOwner, string target)
@@ -83,7 +83,7 @@ namespace Tempest.Social
 			lock (this.watchLists)
 				this.watchLists.Remove (listOwner, target);
 
-			return Task.FromResult (true);
+			return true.CreateTask();
 		}
 
 		public Task ClearAsync (string listOwner)
@@ -94,7 +94,7 @@ namespace Tempest.Social
 			lock (this.watchLists)
 				this.watchLists.Remove (listOwner);
 
-			return Task.FromResult (true);
+			return true.CreateTask();
 		}
 
 		public Task<bool> GetIsWatcherAsync (string watcher, string watchee)
@@ -108,7 +108,7 @@ namespace Tempest.Social
 			lock (this.watchLists)
 				isWatcher = this.watchLists[watcher].Contains (watchee);
 
-			return Task.FromResult (isWatcher);
+			return isWatcher.CreateTask();
 		}
 
 		public Task<IEnumerable<Person>> GetWatchedAsync (string listOwner)
@@ -120,7 +120,7 @@ namespace Tempest.Social
 			lock (this.watchLists)
 				buddies = this.watchLists[listOwner].Select (s => people[s]).ToArray();
 
-			return Task.FromResult<IEnumerable<Person>> (buddies);
+			return buddies.CreateTask<IEnumerable<Person>>();
 		}
 
 		public Task<IEnumerable<Person>> GetWatchersAsync (string target)
@@ -132,7 +132,7 @@ namespace Tempest.Social
 			lock (this.watchLists)
 				owners = this.watchLists.Inverse[target].Select (s => people[s]).ToArray();
 
-			return Task.FromResult<IEnumerable<Person>> (owners);
+			return owners.CreateTask<IEnumerable<Person>>();
 		}
 
 		private readonly Dictionary<string, Person> people = new Dictionary<string, Person>();
