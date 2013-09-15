@@ -55,7 +55,6 @@ namespace Tempest.Social
 			this.RegisterMessageHandler<InviteToGroupMessage> (OnInviteToGroupMessage);
 			this.RegisterMessageHandler<TextMessage> (OnTextMessage);
 			this.RegisterMessageHandler<CreateGroupMessage> (OnCreateGroupMessage);
-			this.RegisterMessageHandler<ForwardMessage> (OnForwardMessage);
 		}
 
 		private readonly IWatchListProvider provider;
@@ -90,43 +89,6 @@ namespace Tempest.Social
 				return null;
 
 			return person;
-		}
-
-		private async void OnForwardMessage (MessageEventArgs<ForwardMessage> e)
-		{
-			Person person = await GetPersonAsync (e.Connection);
-			if (person == null) {
-				await e.Connection.DisconnectAsync();
-				return;
-			}
-
-			if (!String.IsNullOrWhiteSpace (e.Message.Identity))
-				return;
-
-			bool allowed = await this.provider.GetIsWatcherAsync (e.Message.Identity, person.Identity);
-			if (!allowed) { // If we're not a direct watcher, maybe we're in the same group
-				lock (this.sync) {
-					Group group;
-					if (this.groups.TryGetGroup (person.Identity, out group))
-						allowed = group.Participants.Contains (e.Message.Identity);
-				}
-			}
-
-			if (!allowed)
-				return;
-
-			IConnection connection;
-			lock (this.sync) {
-				if (!this.connections.TryGetValue (e.Message.Identity, out connection))
-					return;
-			}
-
-			connection.SendAsync (new ForwardMessage {
-				ForwardedProtocol = e.Message.Protocol,
-				MessageType = e.Message.MessageType,
-				Identity = person.Identity,
-				Payload = e.Message.Payload
-			});
 		}
 
 		private async void OnCreateGroupMessage (MessageEventArgs<CreateGroupMessage> e)

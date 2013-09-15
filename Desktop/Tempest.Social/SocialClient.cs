@@ -50,7 +50,6 @@ namespace Tempest.Social
 			this.RegisterMessageHandler<GroupInviteMessage> (OnGroupInviteMessage);
 			this.RegisterMessageHandler<GroupUpdateMessage> (OnGroupUpdatedMessage);
 			this.RegisterMessageHandler<TextMessage> (OnTextMessage);
-			this.RegisterMessageHandler<ForwardMessage> (OnForwardMessage);
 			this.RegisterMessageHandler<ConnectionInfoMessage> (OnConnectionInfoMessage);
 		}
 
@@ -75,11 +74,6 @@ namespace Tempest.Social
 		/// You have received a text message in a group.
 		/// </summary>
 		public event EventHandler<TextMessageEventArgs> ReceivedTextMessage;
-
-		/// <summary>
-		/// Received a message that was forwarded from another client.
-		/// </summary>
-		public event EventHandler<ForwardedMessageEventArgs> ReceivedForwardedMessage;
 
 		/// <summary>
 		/// Gets your public target that the server sees.
@@ -212,37 +206,6 @@ namespace Tempest.Social
 			});
 		}
 
-		/// <summary>
-		/// Asynchronously forwards a message payload to a another person.
-		/// </summary>
-		/// <param name="forwardTo">The person to forward the payload to.</param>
-		/// <param name="message">The message information to forward.</param>
-		/// <param name="payload">The actual message payload to forward.</param>
-		/// <remarks>
-		/// <para><paramref name="message"/> is passed along to obtain protocol and message type information. You must serialize
-		/// the message's payload yourself into <paramref name="payload"/> and deserialize it the same way on the other end.</para>
-		/// <para>This is done because only you really have access to the proper information to construct a <see cref="ISerializationContext"/>
-		/// to use for writing the payload.</para>
-		/// </remarks>
-		public Task ForwardAsync (Person forwardTo, Message message, byte[] payload)
-		{
-			if (forwardTo == null)
-				throw new ArgumentNullException ("forwardTo");
-			if (message == null)
-				throw new ArgumentNullException ("message");
-			if (payload == null)
-				throw new ArgumentNullException ("payload");
-
-			var forward = new ForwardMessage {
-				ForwardedProtocol = message.Protocol,
-				MessageType = message.MessageType,
-				Identity = forwardTo.Identity,
-				Payload = payload
-			};
-
-			return Connection.SendAsync (forward);
-		}
-
 		private readonly WatchList watchList;
 		private readonly Person persona;
 		private readonly ObservableDictionary<int, Group> groups = new ObservableDictionary<int, Group>();
@@ -262,16 +225,6 @@ namespace Tempest.Social
 		private void OnConnectionInfoMessage (MessageEventArgs<ConnectionInfoMessage> e)
 		{
 			ServerTarget = e.Message.ConnectingFrom;
-		}
-
-		private void OnForwardMessage (MessageEventArgs<ForwardMessage> e)
-		{
-			Person sender;
-			if (!this.watchList.TryGetPerson (e.Message.Identity, out sender))
-				return;
-
-			OnReceivedForwardedMessage (new ForwardedMessageEventArgs (
-				sender, e.Message.ForwardedProtocol, e.Message.MessageType, e.Message.Payload));
 		}
 
 		private void OnTextMessage (MessageEventArgs<TextMessage> e)
@@ -337,13 +290,6 @@ namespace Tempest.Social
 		private void OnRequestBuddyListMessage (MessageEventArgs<RequestBuddyListMessage> e)
 		{
 			Task.Factory.StartNew (OnBuddyListRequested);
-		}
-
-		private void OnReceivedForwardedMessage (ForwardedMessageEventArgs args)
-		{
-			var handler = ReceivedForwardedMessage;
-			if (handler != null)
-				handler (this, args);
 		}
 
 		private void OnTextMessageReceived (TextMessageEventArgs args)
