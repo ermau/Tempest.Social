@@ -79,6 +79,9 @@
     <Compile Include="..\..\Desktop\Tempest.Social\Protocol\BuddyListMessage.cs">
       <Link>Protocol\BuddyListMessage.cs</Link>
     </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Protocol\ConnectionInfoMessage.cs">
+      <Link>Protocol\ConnectionInfoMessage.cs</Link>
+    </Compile>
     <Compile Include="..\..\Desktop\Tempest.Social\Protocol\CreateGroupMessage.cs">
       <Link>Protocol\CreateGroupMessage.cs</Link>
     </Compile>

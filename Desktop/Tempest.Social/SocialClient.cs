@@ -236,7 +236,7 @@ namespace Tempest.Social
 			}
 
 			if (e.Message.SenderId == null) {
-				Trace.TraceWarning ("TextMessage received with no sender");
+				//Trace.TraceWarning ("TextMessage received with no sender");
 				return;
 			}
 
