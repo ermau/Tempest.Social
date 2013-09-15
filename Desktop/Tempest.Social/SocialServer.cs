@@ -57,6 +57,16 @@ namespace Tempest.Social
 			this.RegisterMessageHandler<CreateGroupMessage> (OnCreateGroupMessage);
 		}
 
+		public IWatchListProvider WatchListProvider
+		{
+			get { return this.provider; }
+		}
+
+		public IIdentityProvider IdentityProvider
+		{
+			get { return this.identityProvider; }
+		}
+
 		private readonly IWatchListProvider provider;
 		private readonly IIdentityProvider identityProvider;
 
@@ -65,8 +75,44 @@ namespace Tempest.Social
 		private readonly GroupManager groups = new GroupManager();
 		private readonly BidirectionalDictionary<string, IConnection> connections = new BidirectionalDictionary<string, IConnection>();
 
+		protected object SyncRoot
+		{
+			get { return this.sync; }
+		}
+
+		protected GroupManager Groups
+		{
+			get { return this.groups; }
+		}
+
+		protected IConnection GetConnection (string identity)
+		{
+			if (identity == null)
+				throw new ArgumentNullException ("identity");
+
+			IConnection connection;
+			lock (this.sync)
+				this.connections.TryGetValue (identity, out connection);
+
+			return connection;
+		}
+
+		protected string GetIdentity (IConnection connection)
+		{
+			if (connection == null)
+				throw new ArgumentNullException ("connection");
+			string identity;
+			lock (this.sync)
+				this.connections.TryGetKey (connection, out identity);
+
+			return identity;
+		}
+
 		protected async Task<Person> GetPersonAsync (IConnection connection)
 		{
+			if (connection == null)
+				throw new ArgumentNullException ("connection");
+
 			string identity;
 			bool found;
 			lock (this.sync)
