@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="ConnectEventArgs.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="ForwardedMessageEventArgs.cs" />
     <Compile Include="Group.cs" />
     <Compile Include="GroupEventArgs.cs" />
     <Compile Include="GroupInviteEventArgs.cs" />
@@ -53,6 +54,7 @@
     <Compile Include="PersonIdentityEqualityComparer.cs" />
     <Compile Include="Protocol\ConnectionInfoMessage.cs" />
     <Compile Include="Protocol\CreateGroupMessage.cs" />
+    <Compile Include="Protocol\ForwardMessage.cs" />
     <Compile Include="Protocol\GroupConnectionMessage.cs" />
     <Compile Include="Protocol\GroupInviteResponse.cs" />
     <Compile Include="Protocol\InviteToGroupMessage.cs" />

@@ -101,6 +101,11 @@ namespace Tempest.Social
 		/// </summary>
 		Text = 16,
 
+		/// <summary>
+		/// A forwarded message from another protocol and client
+		/// </summary>
+		Forward = 17,
+
 		ConnectionInfo = 18,
 	}
 
@@ -133,6 +138,7 @@ namespace Tempest.Social
 				new TypePair (typeof(SearchMessage), () => new SearchMessage()),
 				new TypePair (typeof(SearchResultMessage), () => new SearchResultMessage()),
 				new TypePair (typeof(TextMessage), () => new TextMessage()),
+				new TypePair (typeof(ForwardMessage), () => new ForwardMessage()),
 				new TypePair (typeof(ConnectionInfoMessage), () => new ConnectionInfoMessage()),
 			});
 		}
