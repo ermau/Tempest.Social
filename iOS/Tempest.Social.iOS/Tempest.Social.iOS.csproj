@@ -73,6 +73,9 @@
     <Compile Include="..\..\Desktop\Tempest.Social\PersonIdentityEqualityComparer.cs">
       <Link>PersonIdentityEqualityComparer.cs</Link>
     </Compile>
+    <Compile Include="..\..\Desktop\Tempest.Social\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\Desktop\Tempest.Social\Protocol\BuddyListMessage.cs">
       <Link>Protocol\BuddyListMessage.cs</Link>
     </Compile>
@@ -130,7 +133,6 @@
     <Compile Include="..\..\Desktop\Tempest.Social\WatchList.cs">
       <Link>WatchList.cs</Link>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Tempest\iOS\Tempest\Tempest.iOS.csproj">
