@@ -27,9 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Tempest.Social
 {
@@ -86,6 +84,23 @@ namespace Tempest.Social
 		public bool TryGetGroup (int groupId, out Group group)
 		{
 			return this.groups.TryGetValue (groupId, out group);
+		}
+
+		public bool TryGetGroup (string identity, out Group group)
+		{
+			if (identity == null)
+				throw new ArgumentNullException ("identity");
+
+			group = null;
+
+			foreach (Group g in this.groups.Values) {
+				if (g.Participants.Contains (identity)) {
+					group = g;
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		private int nextId;
