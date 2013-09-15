@@ -177,12 +177,12 @@ namespace Tempest.Social
 
 		private void Signal (NotifyCollectionChangedAction action, TKey key, TValue value, bool valueOnly = false)
 		{
-			OnCollectionChanged (new NotifyCollectionChangedEventArgs (action, new KeyValuePair<TKey, TValue> (key, value)));
+			OnCollectionChanged (new NotifyCollectionChangedEventArgs (action, new KeyValuePair<TKey, TValue> (key, value), 0));
 
 			if (!valueOnly)
-				this.keys.SignalCollectionChanged (this, new NotifyCollectionChangedEventArgs (action, key));
+				this.keys.SignalCollectionChanged (this, new NotifyCollectionChangedEventArgs (action, key, 0));
 
-			this.values.SignalCollectionChanged (this, new NotifyCollectionChangedEventArgs (action, value));
+			this.values.SignalCollectionChanged (this, new NotifyCollectionChangedEventArgs (action, value, 0));
 		}
 
 		private sealed class ReadOnlyObservableCollection<T>
