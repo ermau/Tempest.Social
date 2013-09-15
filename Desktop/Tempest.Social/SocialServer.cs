@@ -225,6 +225,15 @@ namespace Tempest.Social
 			}
 		}
 
+		protected override void OnConnectionMade (object sender, ConnectionMadeEventArgs e)
+		{
+			base.OnConnectionMade (sender, e);
+
+			e.Connection.SendAsync (new ConnectionInfoMessage {
+				ConnectingFrom = e.Connection.RemoteTarget
+			});
+		}
+
 		protected override async void OnConnectionDisconnected (object sender, DisconnectedEventArgs e)
 		{
 			string identity = await this.identityProvider.GetIdentityAsync (e.Connection);

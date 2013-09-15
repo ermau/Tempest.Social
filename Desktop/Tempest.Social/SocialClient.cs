@@ -50,6 +50,7 @@ namespace Tempest.Social
 			this.RegisterMessageHandler<GroupInviteMessage> (OnGroupInviteMessage);
 			this.RegisterMessageHandler<GroupUpdateMessage> (OnGroupUpdatedMessage);
 			this.RegisterMessageHandler<TextMessage> (OnTextMessage);
+			this.RegisterMessageHandler<ConnectionInfoMessage> (OnConnectionInfoMessage);
 		}
 
 		/// <summary>
@@ -73,6 +74,16 @@ namespace Tempest.Social
 		/// You have received a text message in a group.
 		/// </summary>
 		public event EventHandler<TextMessageEventArgs> ReceivedTextMessage;
+
+		/// <summary>
+		/// Gets your public target that the server sees.
+		/// </summary>
+		/// <remarks>This is useful for being able to forward messages with your IP to other clients.</remarks>
+		public Target ServerTarget
+		{
+			get;
+			private set;
+		}
 
 		/// <summary>
 		/// Gets your <see cref="Person"/>.
@@ -209,6 +220,11 @@ namespace Tempest.Social
 			Connection.SendAsync (new PersonMessage { Person = Persona });
 
 			base.OnConnected (e);
+		}
+
+		private void OnConnectionInfoMessage (MessageEventArgs<ConnectionInfoMessage> e)
+		{
+			ServerTarget = e.Message.ConnectingFrom;
 		}
 
 		private void OnTextMessage (MessageEventArgs<TextMessage> e)

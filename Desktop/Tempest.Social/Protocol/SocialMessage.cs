@@ -94,16 +94,14 @@ namespace Tempest.Social
 		/// </summary>
 		GroupUpdate = 14,
 		
-		/// <summary>
-		/// 
-		/// </summary>
 		GroupConnection = 15,
 
 		/// <summary>
 		/// Text message
 		/// </summary>
 		Text = 16,
-		
+
+		ConnectionInfo = 18,
 	}
 
 	public abstract class SocialMessage
@@ -135,6 +133,7 @@ namespace Tempest.Social
 				new TypePair (typeof(SearchMessage), () => new SearchMessage()),
 				new TypePair (typeof(SearchResultMessage), () => new SearchResultMessage()),
 				new TypePair (typeof(TextMessage), () => new TextMessage()),
+				new TypePair (typeof(ConnectionInfoMessage), () => new ConnectionInfoMessage()),
 			});
 		}
 	}
