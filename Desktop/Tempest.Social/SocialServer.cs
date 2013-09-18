@@ -173,9 +173,9 @@ namespace Tempest.Social
 			IConnection connection = null;
 			lock (this.sync) {
 				Person invitee;
-				online = (!this.people.TryGetValue (e.Message.Invitee, out invitee)
-				          || invitee.Status == Status.Offline)
-				          && this.connections.TryGetValue (e.Message.Invitee, out connection);
+				online = (this.people.TryGetValue (e.Message.Invitee, out invitee)
+				          && invitee.Status == Status.Offline
+				          && this.connections.TryGetValue (e.Message.Invitee, out connection));
 			}
 
 			if (!online) {
