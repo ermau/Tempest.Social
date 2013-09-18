@@ -26,10 +26,7 @@
 
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Tempest.Social
 {
@@ -37,10 +34,10 @@ namespace Tempest.Social
 	/// Represents a response to a group invite.
 	/// </summary>
 	/// <seealso cref="GroupInviteMessage"/>
-	public sealed class GroupInviteResponse
+	public sealed class GroupInviteResponseMessage
 		: SocialMessage
 	{
-		public GroupInviteResponse()
+		public GroupInviteResponseMessage()
 			: base (SocialMessageType.GroupInviteResponse)
 		{
 			

@@ -54,7 +54,7 @@
     <Compile Include="Protocol\ConnectionInfoMessage.cs" />
     <Compile Include="Protocol\CreateGroupMessage.cs" />
     <Compile Include="Protocol\GroupConnectionMessage.cs" />
-    <Compile Include="Protocol\GroupInviteResponse.cs" />
+    <Compile Include="Protocol\GroupInviteResponseMessage.cs" />
     <Compile Include="Protocol\InviteToGroupMessage.cs" />
     <Compile Include="Protocol\GroupUpdateMessage.cs" />
     <Compile Include="Protocol\GroupInviteMessage.cs" />

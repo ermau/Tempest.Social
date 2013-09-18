@@ -162,7 +162,7 @@ namespace Tempest.Social
 			int groupId = e.Message.GroupId;
 
 			if (inviter == null || !await this.provider.GetIsWatcherAsync (inviter.Identity, e.Message.Invitee)) {
-				e.Connection.SendResponseAsync (e.Message, new GroupInviteResponse {
+				e.Connection.SendResponseAsync (e.Message, new GroupInviteResponseMessage {
 					GroupId = groupId,
 					Response = InvitationResponse.Error
 				});
@@ -179,7 +179,7 @@ namespace Tempest.Social
 			}
 
 			if (!online) {
-				e.Connection.SendResponseAsync (e.Message, new GroupInviteResponse {
+				e.Connection.SendResponseAsync (e.Message, new GroupInviteResponseMessage {
 					GroupId = groupId,
 					Response = InvitationResponse.Offline
 				});
@@ -188,7 +188,7 @@ namespace Tempest.Social
 				lock (this.sync) {
 					Group group;
 					if (!(error = !this.groups.TryGetGroup (groupId, out group))) {
-						connection.SendFor<GroupInviteResponse> (new GroupInviteMessage {
+						connection.SendFor<GroupInviteResponseMessage> (new GroupInviteMessage {
 							Group = group
 						}).ContinueWith (t => {
 							if (t.Result == null)
@@ -206,7 +206,7 @@ namespace Tempest.Social
 				}
 
 				if (error) {
-					e.Connection.SendResponseAsync (e.Message, new GroupInviteResponse {
+					e.Connection.SendResponseAsync (e.Message, new GroupInviteResponseMessage {
 						GroupId = e.Message.GroupId,
 						Response = InvitationResponse.Error
 					});

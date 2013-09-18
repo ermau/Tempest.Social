@@ -125,6 +125,7 @@ namespace Tempest.Social
 				new TypePair (typeof(CreateGroupMessage), () => new CreateGroupMessage()),
 				new TypePair (typeof(GroupConnectionMessage), () => new GroupConnectionMessage()), 
 				new TypePair (typeof(GroupInviteMessage), () => new GroupInviteMessage()),
+				new TypePair (typeof(GroupInviteResponseMessage), () => new GroupInviteResponseMessage()),
 				new TypePair (typeof(GroupUpdateMessage), () => new GroupUpdateMessage()),
 				new TypePair (typeof(InviteToGroupMessage), () => new InviteToGroupMessage()),
 				new TypePair (typeof(LeaveGroupMessage), () => new LeaveGroupMessage()),

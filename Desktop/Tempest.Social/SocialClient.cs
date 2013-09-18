@@ -154,7 +154,7 @@ namespace Tempest.Social
 			if (person == null)
 				throw new ArgumentNullException ("person");
 
-			var response = await Connection.SendFor<GroupInviteResponse> (
+			var response = await Connection.SendFor<GroupInviteResponseMessage> (
 				new InviteToGroupMessage {
 					Invitee = person.Identity,
 					GroupId = group.Id
@@ -280,7 +280,7 @@ namespace Tempest.Social
 				var args = new GroupInviteEventArgs (msg.Group);
 				OnGroupInvite (args);
 
-				Connection.SendResponseAsync (msg, new GroupInviteResponse {
+				Connection.SendResponseAsync (msg, new GroupInviteResponseMessage {
 					GroupId = msg.Group.Id,
 					Response = (args.AcceptInvite) ? InvitationResponse.Accepted : InvitationResponse.Rejected
 				});
