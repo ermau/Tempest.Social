@@ -115,14 +115,19 @@ namespace Tempest.Social
 		/// <returns>The created <see cref="Group"/> or <c>null</c> if disconnected.</returns>
 		public async Task<Group> CreateGroupAsync()
 		{
-			var response = await Connection.SendFor<GroupUpdateMessage> (new CreateGroupMessage()).ConfigureAwait (false);
-			if (response == null)
+			try {
+				var response = await Connection.SendFor (new CreateGroupMessage()).ConfigureAwait (false);
+				var createResponse = response as GroupUpdateMessage;
+				if (createResponse == null)
+					return null;
+
+				lock (this.groups)
+					this.groups.Add (createResponse.Group.Id, createResponse.Group);
+
+				return createResponse.Group;
+			} catch (OperationCanceledException) {
 				return null;
-
-			lock (this.groups)
-				this.groups.Add (response.Group.Id, response.Group);
-
-			return response.Group;
+			}
 		}
 
 		/// <summary>
@@ -154,16 +159,20 @@ namespace Tempest.Social
 			if (person == null)
 				throw new ArgumentNullException ("person");
 
-			var response = await Connection.SendFor<GroupInviteResponseMessage> (
-				new InviteToGroupMessage {
+			try {
+				var response = await Connection.SendFor (new InviteToGroupMessage {
 					Invitee = person.Identity,
 					GroupId = group.Id
 				}).ConfigureAwait (false);
 
-			if (response == null)
-				return null;
+				var inviteResponse = response as GroupInviteResponseMessage;
+				if (inviteResponse == null)
+					return null;
 
-			return new Invitation (group, person, response.Response);
+				return new Invitation (group, person, inviteResponse.Response);
+			} catch (OperationCanceledException) {
+				return null;
+			}
 		}
 
 		/// <summary>
@@ -180,11 +189,16 @@ namespace Tempest.Social
 			if (nickname.Trim() == String.Empty)
 				throw new ArgumentException ("nickname can not be empty", "nickname");
 
-			var response = await Connection.SendFor<SearchResultMessage> (new SearchMessage { Nickname = nickname }).ConfigureAwait (false);
-			if (response == null)
-				return null;
+			try {
+				var responseMsg = await Connection.SendFor (new SearchMessage { Nickname = nickname }).ConfigureAwait (false);
+				var searchResponse = responseMsg as SearchResultMessage;
+				if (searchResponse == null)
+					return Enumerable.Empty<Person>();
 
-			return response.Results;
+				return searchResponse.Results;
+			} catch (OperationCanceledException) {
+				return Enumerable.Empty<Person>();
+			}
 		}
 
 		/// <summary>
