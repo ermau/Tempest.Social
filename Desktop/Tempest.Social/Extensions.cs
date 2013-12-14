@@ -37,7 +37,9 @@ namespace Tempest.Social
 #if !SILVERLIGHT
 			return Task.FromResult (self);
 #else
-			return TaskEx.FromResult (self);
+			var tcs = new TaskCompletionSource<T>();
+			tcs.SetResult (self);
+			return tcs.Task;
 #endif
 		}
 	}

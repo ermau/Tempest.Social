@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -58,7 +59,7 @@ namespace Tempest.Social.Tests
 			var c = new MockClientConnection (provider);
 			client = new ConnectionBuffer (c);
 
-			clientContext = new SerializationContext (c, SocialProtocol.Instance);
+			clientContext = new SerializationContext (c, new Dictionary<byte, Protocol> { { 2, SocialProtocol.Instance } });
 
 			var context = new TempestClient (c, MessageTypes.Reliable);
 			context.ConnectAsync (new Target (Target.LoopbackIP, 1)).Wait();
